@@ -32,8 +32,8 @@
             <div class="form-group">
                 <label for="gender">Gender</label>
                 <select id="gender" name="gender" required>
-                    <option value="L">Laki-laki</option>
-                    <option value="P">Perempuan</option>
+                    <option value="Pria">Pria</option>
+                    <option value="Wanita">Wanita</option>
                 </select>
             </div>
             <div class="form-group">

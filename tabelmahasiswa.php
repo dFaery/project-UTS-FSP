@@ -137,7 +137,6 @@ if ($mysqli->connect_errno) {
 
                                 echo "<td>" . htmlspecialchars($nrp) . "</td>";
                                 echo "<td>" . htmlspecialchars($nama) . "</td>";
-                                echo "<td>";
                                 echo "<td>" . htmlspecialchars($gender) . "</td>";
                                 echo "<td>" . htmlspecialchars($tgllahir) . "</td>";
                                 echo "<td>" . htmlspecialchars($angkatan) . "</td>";
