@@ -1,4 +1,7 @@
 <?php
+require_once("class/mahasiswa.php");
+$mahasiswa = new Mahasiswa();
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['nrp']) || empty($_POST['nama'])) {
     die("Akses tidak sah atau data tidak lengkap.");
 }
@@ -30,16 +33,7 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
     }
 }
 
-$stmt = $mysqli->prepare("INSERT INTO mahasiswa (nrp, nama, gender, tanggal_lahir, angkatan, foto_extention) VALUES (?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("ssssis", $nrp, $nama, $gender, $tanggal_lahir, $angkatan, $foto_extension);
+$result = $mahasiswa->insertMahasiswa($nrp, $nama, $gender, $tanggal_lahir, $angkatan, $foto_extension);
 
-if ($stmt->execute()) {
-    header("Location: tabelmahasiswa.php");
-    exit();
-} else {
-    echo "Error: " . $stmt->error;
-}
 
-$stmt->close();
-$mysqli->close();
 ?>

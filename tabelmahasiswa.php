@@ -1,8 +1,12 @@
 <?php
+require_once("class/mahasiswa.php");
+
 $mysqli = new mysqli("localhost", "root", "", "fullstack");
 if ($mysqli->connect_errno) {
     die("Failed to connect to MySQL: " . $mysqli->connect_error);
 }
+
+$mahasiswa = new Mahasiswa();
 ?>
 
 <!DOCTYPE html>
@@ -110,13 +114,9 @@ if ($mysqli->connect_errno) {
             </thead>
             <tbody>
                 <?php
-                    $stmt = $mysqli->prepare("SELECT * FROM mahasiswa");
+                    $result = $mahasiswa->getMahasiswa();                    
                     
-                    if ($stmt) {
-                        $stmt->execute();
-                        $result = $stmt->get_result();
-
-                        if ($result->num_rows > 0) {
+                    if ($result->num_rows > 0) {
                             while($row = $result->fetch_assoc()) {
                                 $nrp = $row['nrp'];
                                 $nama = $row['nama'];
@@ -149,10 +149,6 @@ if ($mysqli->connect_errno) {
                         } else {
                             echo "<tr><td colspan='4'>Tidak ada data mahasiswa.</td></tr>";
                         }
-                        $stmt->close();
-                    } else {
-                        echo "<tr><td colspan='4'>Error: " . $mysqli->error . "</td></tr>";
-                    }
 
                     $mysqli->close();
                 ?>

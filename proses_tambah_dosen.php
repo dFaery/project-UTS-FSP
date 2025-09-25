@@ -1,4 +1,7 @@
 <?php
+require_once("class/dosen.php");
+$dosen = new Dosen();
+
 // Validasi dasar
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['npk']) || empty($_POST['nama'])) {
     die("Akses tidak sah atau data tidak lengkap.");
@@ -29,16 +32,7 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
 }
 
 // Gunakan prepared statement untuk memasukkan data
-$stmt = $mysqli->prepare("INSERT INTO dosen (npk, nama, foto_extension) VALUES (?, ?, ?)");
-$stmt->bind_param("sss", $npk, $nama, $foto_extension);
-
-if ($stmt->execute()) {
-    // Jika berhasil, redirect kembali ke halaman tabel dosen
-    header("Location: tabeldosen.php");
-    exit();
-} else {
-    echo "Error: " . $stmt->error;
-}
+$result = $dosen->insertDosen($npk, $nama, $foto_extension);
 
 $stmt->close();
 $mysqli->close();

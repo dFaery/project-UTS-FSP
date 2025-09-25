@@ -1,12 +1,17 @@
 <?php
+require_once("class/dosen.php");
+
 $mysqli = new mysqli("localhost", "root", "", "fullstack");
 if ($mysqli->connect_errno) {
     die("Failed to connect to MySQL: " . $mysqli->connect_error);
 }
+
+$dosen = new Dosen();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,6 +23,7 @@ if ($mysqli->connect_errno) {
             margin: 0;
             padding: 20px;
         }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -26,32 +32,40 @@ if ($mysqli->connect_errno) {
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
+
         h1 {
             text-align: center;
             color: #2c3e50;
             margin-bottom: 20px;
         }
+
         .table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        .table th, .table td {
+
+        .table th,
+        .table td {
             padding: 12px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
+
         .table th {
             background-color: #3498db;
             color: white;
             text-transform: uppercase;
         }
+
         .table tbody tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+
         .table tbody tr:hover {
             background-color: #e9ecef;
         }
+
         .aksi-btn {
             padding: 8px 12px;
             border-radius: 5px;
@@ -59,12 +73,15 @@ if ($mysqli->connect_errno) {
             color: white;
             font-weight: bold;
         }
+
         .edit-btn {
             background-color: #f39c12;
         }
+
         .delete-btn {
             background-color: #e74c3c;
         }
+
         .photo-thumbnail {
             width: 80px;
             height: 80px;
@@ -72,6 +89,7 @@ if ($mysqli->connect_errno) {
             border-radius: 50%;
             border: 2px solid #ddd;
         }
+
         .btn-add {
             display: inline-block;
             padding: 10px 15px;
@@ -81,6 +99,7 @@ if ($mysqli->connect_errno) {
             border-radius: 5px;
             margin-bottom: 20px;
         }
+
         .btn-back {
             display: inline-block;
             padding: 10px 15px;
@@ -91,6 +110,7 @@ if ($mysqli->connect_errno) {
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Tabel Dosen</h1>
@@ -106,49 +126,42 @@ if ($mysqli->connect_errno) {
                 </tr>
             </thead>
             <tbody>
-                <?php
-                    $stmt = $mysqli->prepare("SELECT * FROM dosen");
-                    
-                    if ($stmt) {
-                        $stmt->execute();
-                        $result = $stmt->get_result();
+                <?php                
+                $result = $dosen->getDosen();
 
-                        if ($result->num_rows > 0) {
-                            while($row = $result->fetch_assoc()) {
-                                $npk = $row['npk'];
-                                $nama = $row['nama'];
-                                $foto_ext = $row['foto_extension'];
+                // display data to table
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $npk = $row['npk'];
+                        $nama = $row['nama'];
+                        $foto_ext = $row['foto_extension'];
 
-                                echo "<tr>";
-                                echo "<td>";
-                                $foto_path = "images/" . $npk . "." . $foto_ext;
-                                if (file_exists($foto_path) && !empty($foto_ext)) {
-                                    echo "<img src='" . htmlspecialchars($foto_path) . "' alt='Foto " . htmlspecialchars($nama) . "' class='photo-thumbnail'>";
-                                } else {
-                                    echo "Foto tidak tersedia";
-                                }
-                                echo "</td>";
-
-                                echo "<td>" . htmlspecialchars($npk) . "</td>";
-                                echo "<td>" . htmlspecialchars($nama) . "</td>";
-                                echo "<td>";
-                                echo "<a href='editdosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn edit-btn'>Edit</a> | ";
-                                echo "<a href='hapusdosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
-                                echo "</td>";
-                                echo "</tr>";
-                            }
+                        echo "<tr>";
+                        echo "<td>";
+                        $foto_path = "images/" . $npk . "." . $foto_ext;
+                        if (file_exists($foto_path) && !empty($foto_ext)) {
+                            echo "<img src='" . htmlspecialchars($foto_path) . "' alt='Foto " . htmlspecialchars($nama) . "' class='photo-thumbnail'>";
                         } else {
-                            echo "<tr><td colspan='4'>Tidak ada data dosen.</td></tr>";
+                            echo "Foto tidak tersedia";
                         }
-                        $stmt->close();
-                    } else {
-                        echo "<tr><td colspan='4'>Error: " . $mysqli->error . "</td></tr>";
-                    }
+                        echo "</td>";
 
-                    $mysqli->close();
+                        echo "<td>" . htmlspecialchars($npk) . "</td>";
+                        echo "<td>" . htmlspecialchars($nama) . "</td>";
+                        echo "<td>";
+                        echo "<a href='editdosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn edit-btn'>Edit</a> | ";
+                        echo "<a href='hapusdosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
+                        echo "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='4'>Tidak ada data dosen.</td></tr>";
+                }                
+                $mysqli->close();
                 ?>
             </tbody>
         </table>
     </div>
 </body>
+
 </html>
