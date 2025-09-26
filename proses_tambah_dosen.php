@@ -33,7 +33,4 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
 
 // Gunakan prepared statement untuk memasukkan data
 $result = $dosen->insertDosen($npk, $nama, $foto_extension);
-
-$stmt->close();
-$mysqli->close();
 ?>
