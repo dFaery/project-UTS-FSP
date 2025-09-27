@@ -1,4 +1,7 @@
 <?php
+session_start();
+require_once("class/akun.php");
+$akun = new Akun();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die("Akses tidak sah.");
@@ -13,13 +16,10 @@ if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $sql_login = "SELECT username, password FROM akun WHERE username=? AND password=?;";
-    $stmt_login = $mysqli->prepare($sql_login);
-    $stmt_login->bind_param("ss", $username, $password);
-    $stmt_login->execute();
-    $result = $stmt_login->get_result();
+    $result = $akun->login($username, $password);
 
     if ($result->num_rows > 0) {
+        $_SESSION['user'] = $username;
         if($username == "admin"){
             header("Location: adminhome.php");
         }else{

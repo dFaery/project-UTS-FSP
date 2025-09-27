@@ -1,3 +1,15 @@
+<?php
+session_start(); 
+if(isset($_SESSION['user'])){
+    $username = $_SESSION['user'];
+    if($username != "admin"){
+        header("Location: login.php");
+    }
+}
+else{
+    header("Location: login.php");
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

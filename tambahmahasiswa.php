@@ -20,7 +20,7 @@
 <body>
     <div class="container">
         <h1>Form Tambah Mahasiswa</h1>
-        <form action="proses_tambah_mahasiswa.php" method="POST" enctype="multipart/form-data">
+        <form action="tambahakun.php" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="nrp">NRP</label>
                 <input type="text" id="nrp" name="nrp" required maxlength="9">
@@ -50,7 +50,7 @@
             </div>
             <div class="btn-group">
                 <a href="tabelmahasiswa.php" class="btn btn-back">Batal</a>
-                <button type="submit" class="btn btn-save">Simpan Data</button>
+                <button type="submit" class="btn btn-save" name="submit-mahasiswa">Simpan Data</button>
             </div>
         </form>
     </div>

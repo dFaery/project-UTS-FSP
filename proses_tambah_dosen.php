@@ -1,4 +1,6 @@
+<!-- GADIPAKE -->
 <?php
+session_start();
 require_once("class/dosen.php");
 $dosen = new Dosen();
 
@@ -24,13 +26,17 @@ if (isset($_FILES['foto']) && $_FILES['foto']['error'] == 0) {
     if (in_array($extension, $allowed_extensions)) {
         $foto_extension = $extension;
         $target_file = "images/" . $npk . '.' . $foto_extension;
-        
+
         if (!move_uploaded_file($_FILES['foto']['tmp_name'], $target_file)) {
             die("Gagal mengupload file.");
         }
     }
 }
 
-// Gunakan prepared statement untuk memasukkan data
-$result = $dosen->insertDosen($npk, $nama, $foto_extension);
+
+if ($result = $dosen->insertDosen($npk, $nama, $foto_extension)) {
+    echo "Ke tambah akun";
+} else {
+    header("location: tambahakun.php");
+}
 ?>

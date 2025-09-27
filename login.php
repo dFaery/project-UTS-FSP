@@ -1,8 +1,5 @@
 <?php
-$mysqli = new mysqli("localhost", "root", "", "fullstack");
-if ($mysqli->connect_errno) {
-    die("Failed to connect to MySQL: " . $mysqli->connect_error);
-}
+session_start();
 ?>
 
 <!DOCTYPE html>
@@ -14,105 +11,74 @@ if ($mysqli->connect_errno) {
     <title>Tabel Dosen</title>
     <style>
         body {
+            display: flex;
+            justify-content: center;
+            /* ⬅️ untuk horizontal center */
+            align-items: center;
+            /* ⬅️ untuk vertical center */
+            height: 100vh;
+            /* ⬅️ agar tinggi penuh layar */
             font-family: sans-serif;
             background-color: #f0f2f5;
             margin: 0;
-            padding: 20px;
+            /* ⬅️ hilangkan margin default */
         }
 
         .container {
-            max-width: 500px;
-            margin: 0 auto;
+            width: 400px;
             background-color: #fff;
-            padding: 20px;
+            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-
+        h1,
         h2 {
             text-align: center;
             color: #2c3e50;
+        }
+
+        .form-group {
             margin-bottom: 20px;
         }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .table th,
-        .table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .table th {
-            background-color: #3498db;
-            color: white;
-            text-transform: uppercase;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        .table tbody tr:hover {
-            background-color: #e9ecef;
-        }
-
-        .aksi-btn {
-            padding: 8px 12px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: white;
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
             font-weight: bold;
         }
 
-        .edit-btn {
-            background-color: #f39c12;
-        }
-
-        .delete-btn {
-            background-color: #e74c3c;
-        }
-
-        .photo-thumbnail {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 2px solid #ddd;
-        }
-
-        .btn-add {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: #2ecc71;
-            color: white;
-            text-decoration: none;
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-save {
+            background-color: #2ecc71;
+            flex-grow: 1;
+            width: 100%;
         }
 
         .btn-back {
-            display: inline-block;
-            padding: 10px 15px;
             background-color: #7f8c8d;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        #username{
-
         }
     </style>
 </head>
@@ -121,13 +87,18 @@ if ($mysqli->connect_errno) {
     <div class="container">
         <h2>Login</h2>
         <form action="proses_login.php" method="post">
-            <label for="username">Username:</label><br>
-            <input type="text" id="username" name="username" required><br><br>
 
-            <label for="password">Password:</label><br>
-            <input type="password" id="password" name="password" required><br><br>
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
 
-            <button type="submit" name="login">Login</button>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <button type="submit" name="login" class="btn btn-save">Login</button>
         </form>
     </div>
 </body>

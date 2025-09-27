@@ -26,16 +26,8 @@ class Dosen extends classParent
     {
         $stmt = $this->mysqli->prepare("INSERT INTO dosen (npk, nama, foto_extension) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $npk, $nama, $foto_extension);
-        if ($stmt->execute()) {
-            // Jika berhasil, redirect kembali ke halaman tabel dosen
-            header("Location: tabeldosen.php");
-            exit();
-        } else {
-            echo "Error: " . $stmt->error;
-        }
-
-        $stmt->close();
-        $this->mysqli->close();
+        $stmt->execute();
+        $stmt->close();        
     }
 
     public function deleteDosen($npk_to_delete)

@@ -1,3 +1,4 @@
+<!-- GADIPAKE -->
 <?php
 require_once("class/mahasiswa.php");
 $mahasiswa = new Mahasiswa();
