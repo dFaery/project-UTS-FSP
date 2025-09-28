@@ -7,6 +7,8 @@ if ($mysqli->connect_errno) {
 }
 
 $dosen = new Dosen();
+
+$PER_PAGE = 5;
 ?>
 
 <!DOCTYPE html>
@@ -108,14 +110,127 @@ $dosen = new Dosen();
             text-decoration: none;
             border-radius: 5px;
         }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .form-group button {
+            padding: 10px 15px;
+            width: fit-content;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #btn-paging {
+            display: flex;
+            width: fit-content;
+            /* geser balik biar center */
+            justify-content: center;
+            padding: 10px;
+            background-color: white;
+            border-radius: 12px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .btn-page {
+            text-decoration: none;
+            height: fit-content;
+            color: #2c3e50;
+            background-color: none;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 8px 8px;
+            margin: 0 4px;
+            transition: background-color 0.3s ease;
+        }
+
+
+        .btn-page:hover {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+
+        .btn-next,
+        .btn-previous,
+        .btn-first,
+        .btn-last {
+            text-decoration: none;
+            color: #2c3e50;
+            padding: 8px 12px;
+            margin: 0 4px;
+            font-weight: 500;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .btn-next-disabled,
+        .btn-previous-disabled {
+            width: 64px;
+            text-decoration: none;
+            color: #aaa;
+            padding: 8px 12px;
+            margin: 0 4px;
+            font-weight: 500;
+            cursor: not-allowed;
+        }
+
+        .btn-next:hover,
+        .btn-previous:hover,
+        .btn-first:hover,
+        .btn-last:hover {
+            color: #3498db;
+            transition: color 0.3s ease;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <h1>Tabel Dosen</h1>
-        <a href="adminhome.php" class="btn-back">Kembali</a>
-        <a href="tambahdosen.php" class="btn-add">Tambah Dosen Baru</a>
+        <div class="top-bar">
+            <form action="" method="get">
+                <div class="form-group">
+                    <input type="text" name="cari" id="" placeholder="Cari NPK atau Nama" value="<?php echo isset($_GET['cari']) ? htmlspecialchars($_GET['cari']) : ''; ?>">
+                    <button type="submit">Cari</button>
+                </div>
+            </form>
+            <div class="btn-group">
+                <a href="adminhome.php" class="btn-back">Kembali</a>
+                <a href="tambahdosen.php" class="btn-add">Tambah Dosen Baru</a>
+            </div>
+        </div>
+
+        <?php
+        $cari = isset($_GET['cari']) ? $_GET['cari'] : "";
+
+        $cari_persen = "%" . $cari . "%";
+        ?>
+
         <table class="table">
             <thead>
                 <tr>
@@ -126,8 +241,10 @@ $dosen = new Dosen();
                 </tr>
             </thead>
             <tbody>
-                <?php                
-                $result = $dosen->getDosen();
+                <?php
+                $offset = isset($_GET["start"]) ? (int)$_GET["start"] : 0;
+
+                $result = $dosen->getDosen($cari_persen, null, $offset, $PER_PAGE);
 
                 // display data to table
                 if ($result->num_rows > 0) {
@@ -156,12 +273,57 @@ $dosen = new Dosen();
                     }
                 } else {
                     echo "<tr><td colspan='4'>Tidak ada data dosen.</td></tr>";
-                }                
+                }
                 $mysqli->close();
                 ?>
             </tbody>
         </table>
+        <div class="pagination">
+            <?php
+            $res = $dosen->getDosen($cari_persen);
+
+            // // paging first
+            // echo "<a href='?start=0&cari=$cari' class='btn-first'>First </a>";
+
+            if ($offset > 0) {
+                $prev = $offset - $PER_PAGE;
+                echo "<a href='?start=$prev&cari=$cari' class='btn-previous'>Previous </a>";
+            } else {
+                $prev = 0;
+                echo "<a href='?start=$prev&cari=$cari' class='btn-previous-disabled'>Previous </a>";
+            }
+
+            $total_data = $res->num_rows;
+            $maks_page = ceil($total_data / $PER_PAGE);
+            for ($page = 1; $page <= $maks_page; $page++) {
+                $offs = ($page - 1) * $PER_PAGE;
+                echo "<a href='?start=$offs&cari=$cari' class='btn-page'>$page</a>";
+            }
+
+            if ($offset + $PER_PAGE < $total_data) {
+                $next = $offset + $PER_PAGE;
+                echo "<a href='?start=$next&cari=$cari' class='btn-next'>Next</a>";
+            } else {
+                $next = $offset;
+                echo "<a href='?start=$next&cari=$cari' class='btn-next-disabled'>Next</a>";
+            }
+
+            // // paging last
+            // $last_page = ($maks_page - 1) * $PER_PAGE;
+            // echo "<a href='?start=$last_page&cari=$cari' class='btn-last'> Last</a>";
+            ?>
+
+        </div>
     </div>
+    <script src="jquery-3.7.1.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Contoh disable tombol Previous
+            $('.btn-previous-disabled').removeAttr('href');
+            $('.btn-next-disabled').removeAttr('href');
+        })
+    </script>
+
 </body>
 
 </html>

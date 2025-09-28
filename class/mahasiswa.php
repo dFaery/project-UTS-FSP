@@ -8,18 +8,31 @@ class Mahasiswa extends classParent
         parent::__construct();
     }
 
-    public function getMahasiswa($nrp_to_edit = null)
+    public function getMahasiswa($cari_mahasiswa, $nrp_to_edit = null, $offset = null, $limit = null)
     {
+
+        $cari_persen = "%" . $cari_mahasiswa . "%";
+
+
         if ($nrp_to_edit == null) {
-            $stmt = $this->mysqli->prepare("SELECT * FROM mahasiswa");
-            $stmt->execute();
-            return $stmt->get_result();
+            if (!is_null($offset)) {
+                $stmt = $this->mysqli->prepare("SELECT * FROM mahasiswa WHERE nrp LIKE ? OR nama LIKE ? LIMIT ? OFFSET ?");
+                $stmt->bind_param("ssii", $cari_persen, $cari_persen, $limit, $offset);
+                $stmt->execute();
+                return $stmt->get_result();
+            } else {
+                $stmt = $this->mysqli->prepare("SELECT * FROM mahasiswa WHERE nrp LIKE ? OR nama LIKE ?");
+                $stmt->bind_param("ss", $cari_persen, $cari_persen);
+                $stmt->execute();
+                return $stmt->get_result();
+            }
         } else {
             $stmt = $this->mysqli->prepare("SELECT * FROM mahasiswa WHERE nrp = ?");
             $stmt->bind_param("s", $nrp_to_edit);
             $stmt->execute();
             return $stmt->get_result();
         }
+        
     }
 
     public function insertMahasiswa($nrp, $nama, $gender, $tanggal_lahir, $angkatan, $foto_extension)

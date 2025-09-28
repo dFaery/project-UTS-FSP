@@ -8,12 +8,23 @@ class Dosen extends classParent
         parent::__construct();
     }
 
-    public function getDosen($npk_to_edit = null)
+    public function getDosen($cari_dosen, $npk_to_edit = null, $offset = null, $limit = null)
     {
+        $cari_persen = "%" . $cari_dosen . "%";
+
         if ($npk_to_edit == null) {
-            $stmt = $this->mysqli->prepare("SELECT * FROM dosen");
-            $stmt->execute();
-            return $stmt->get_result();
+            if(!is_null($offset)){
+                $stmt = $this->mysqli->prepare("SELECT * FROM dosen WHERE npk LIKE ? OR nama LIKE ? LIMIT ? OFFSET ?");
+                $stmt->bind_param("ssii", $cari_persen, $cari_persen, $limit, $offset);
+                $stmt->execute();
+                return $stmt->get_result();
+            }
+            else{
+                $stmt = $this->mysqli->prepare("SELECT * FROM dosen WHERE npk LIKE ? OR nama LIKE ?");
+                $stmt->bind_param("ss", $cari_persen, $cari_persen);
+                $stmt->execute();
+                return $stmt->get_result();
+            }
         } else {
             $stmt = $this->mysqli->prepare("SELECT npk, nama, foto_extension FROM dosen WHERE npk = ?");
             $stmt->bind_param("s", $npk_to_edit);
@@ -27,7 +38,7 @@ class Dosen extends classParent
         $stmt = $this->mysqli->prepare("INSERT INTO dosen (npk, nama, foto_extension) VALUES (?, ?, ?)");
         $stmt->bind_param("sss", $npk, $nama, $foto_extension);
         $stmt->execute();
-        $stmt->close();        
+        $stmt->close();
     }
 
     public function deleteDosen($npk_to_delete)
