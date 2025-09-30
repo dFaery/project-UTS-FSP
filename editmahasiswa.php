@@ -1,26 +1,20 @@
 <?php
+require_once("class/mahasiswa.php");
+$mahasiswa = new Mahasiswa();
+
 if (!isset($_GET['nrp'])) {
     die("NRP tidak ditemukan.");
 }
 $nrp_to_edit = $_GET['nrp'];
 
-$mysqli = new mysqli("localhost", "root", "", "fullstack");
-if ($mysqli->connect_errno) {
-    die("Gagal terhubung ke MySQL: " . $mysqli->connect_error);
-}
-
-$stmt = $mysqli->prepare("SELECT * FROM mahasiswa WHERE nrp = ?");
-$stmt->bind_param("s", $nrp_to_edit);
-$stmt->execute();
-$result = $stmt->get_result();
+$result = $mahasiswa->getMahasiswa($nrp_to_edit);
 
 if ($result->num_rows === 0) {
     die("Data mahasiswa tidak ditemukan.");
 }
 $mahasiswa = $result->fetch_assoc();
-$stmt->close();
-$mysqli->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,8 +51,8 @@ $mysqli->close();
              <div class="form-group">
                 <label for="gender">Gender</label>
                 <select id="gender" name="gender" required>
-                    <option value="L" <?php if ($mahasiswa['gender'] == 'L') echo 'selected'; ?>>Laki-laki</option>
-                    <option value="P" <?php if ($mahasiswa['gender'] == 'P') echo 'selected'; ?>>Perempuan</option>
+                    <option value="Pria" <?php if ($mahasiswa['gender'] == 'Pria') echo 'selected'; ?>>Pria</option>
+                    <option value="Pria" <?php if ($mahasiswa['gender'] == 'Wanita') echo 'selected'; ?>>Wanita</option>
                 </select>
             </div>
             <div class="form-group">
@@ -70,11 +64,11 @@ $mysqli->close();
                 <input type="number" id="angkatan" name="angkatan" value="<?php echo htmlspecialchars($mahasiswa['angkatan']); ?>" required min="1900" max="2099" step="1">
             </div>
             <div class="form-group">
-                <label for="foto">Ganti Foto (Kosongkan jika tidak ingin ganti)</label>
+                <label for="foto">Ganti Foto (Kosongkan jika tidak ingin ganti)</label>                
                 <?php
                 if (!empty($mahasiswa['foto_extension'])) {
-                    $foto_path = "images/" . $mahasiswa['nrp'] . "." . $mahasiswa['foto_extension'];
-                    echo "<img src='" . htmlspecialchars($foto_path) . "' alt='Foto saat ini' class='current-photo'>";
+                    $foto_path = "images/" . $mahasiswa['nrp'] . "." . $mahasiswa['foto_extension'];                    
+                    echo "<img src='" . $foto_path . "' alt='Foto saat ini' class='current-photo'>";                                        
                 }
                 ?>
                 <input type="file" id="foto" name="foto" accept="image/jpeg, image/png">
