@@ -2,7 +2,8 @@
 session_start(); 
 if(isset($_SESSION['user'])){
     $username = $_SESSION['user'];
-    if($username != "admin"){
+    $isadmin = $_SESSION['is_admin'];
+    if($isadmin != 1){
         header("Location: login.php");
     }
 }

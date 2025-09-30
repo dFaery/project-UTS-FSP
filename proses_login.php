@@ -12,6 +12,7 @@ if ($mysqli->connect_errno) {
     die("Gagal terhubung ke MySQL: " . $mysqli->connect_error);
 }
 
+
 if (isset($_POST['login'])) {
     $username = $_POST['username'];
     $password = $_POST['password'];
@@ -19,14 +20,18 @@ if (isset($_POST['login'])) {
     $result = $akun->login($username, $password);
 
     if ($result->num_rows > 0) {
-        $_SESSION['user'] = $username;
-        if($username == "admin"){
+        $user_data = $result->fetch_assoc();
+
+        $_SESSION['user'] = $user_data['username'];
+        $_SESSION['is_admin'] = $user_data['isadmin'];
+
+        if ($user_data['isadmin'] == 1) {
             header("Location: adminhome.php");
-        }else{
+        } else {
             header("Location: home.php");
         }
-        echo "Account $username Found";
     } else {
         echo "Account not found";
     }
 }
+?>
