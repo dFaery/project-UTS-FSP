@@ -39,16 +39,8 @@ class Mahasiswa extends classParent
     {
         $stmt = $this->mysqli->prepare("INSERT INTO mahasiswa (nrp, nama, gender, tanggal_lahir, angkatan, foto_extention) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssis", $nrp, $nama, $gender, $tanggal_lahir, $angkatan, $foto_extension);
-
-        if ($stmt->execute()) {
-            header("Location: tabelmahasiswa.php");
-            exit();
-        } else {
-            echo "Error: " . $stmt->error;
-        }
-
+        $stmt->execute();
         $stmt->close();
-        $this->mysqli->close();
     }
 
     public function deleteMahasiswa($nrp_to_delete)
