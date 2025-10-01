@@ -8,20 +8,16 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabel Dosen</title>
+    <title>Login</title>
     <style>
         body {
             display: flex;
             justify-content: center;
-            /* ⬅️ untuk horizontal center */
             align-items: center;
-            /* ⬅️ untuk vertical center */
             height: 100vh;
-            /* ⬅️ agar tinggi penuh layar */
             font-family: sans-serif;
             background-color: #f0f2f5;
             margin: 0;
-            /* ⬅️ hilangkan margin default */
         }
 
         .container {
