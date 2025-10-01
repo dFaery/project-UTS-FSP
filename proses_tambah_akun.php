@@ -3,14 +3,12 @@ session_start();
 require_once("class/akun.php");
 require_once("class/dosen.php");
 require_once("class/mahasiswa.php");
+echo "<script src='jquery-3.7.1.js'></script>";
 
 $akun = new Akun();
 $username = $_POST['username'];
 $password = $_POST['password'];
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    die("Akses tidak sah.");
-}
 if (isset($_POST['submit_dosen'])) {
     $dosen = new Dosen();
 
@@ -18,22 +16,43 @@ if (isset($_POST['submit_dosen'])) {
     $nama = $_POST['nama'];
     $foto_extension = $_POST['foto_extension'];
 
-    $dosen->insertDosen($npk, $nama, $foto_extension);
-    $akun->insertAkunDosen($username, $password, $npk);
-
-    header("Location: tabeldosen.php");
+    try {
+        $dosen->insertDosen($npk, $nama, $foto_extension);
+        $akun->insertAkunDosen($username, $password, $npk);
+        header("Location: tabeldosen.php");
+    } catch (Exception $e) {
+        echo "<script>
+        $(document).ready(function() {
+            alert('Gagal menambahkan akun. NPK sudah terdaftar.');                    
+            });
+            </script>";
+            
+        echo "ERROR MESSAGE: " . $e->getMessage();
+        echo "<a href='tabeldosen.php'>Kembali</a>";
+    }
 } else if (isset($_POST['submit_mahasiswa'])) {
     $mahasiswa = new Mahasiswa();
-    
+
     $nrp = $_POST['nrp'];
     $nama = $_POST['nama'];
     $gender = $_POST['gender'];
     $tanggal_lahir = $_POST['tanggal_lahir'];
     $angkatan = $_POST['angkatan'];
     $foto_extension = $_POST['foto_extension'];
-    
-    $mahasiswa->insertMahasiswa($nrp, $nama, $gender, $tanggal_lahir, $angkatan, $foto_extension);
-    $akun->insertAkunMahasiswa($username, $password, $nrp);
-    
-    header("Location: tabelmahasiswa.php");
+
+    try {
+        
+        $mahasiswa->insertMahasiswa($nrp, $nama, $gender, $tanggal_lahir, $angkatan, $foto_extension);
+        $akun->insertAkunMahasiswa($username, $password, $nrp);
+        header("Location: tabelmahasiswa.php");
+    } catch (Exception $e) {
+        echo "<script>
+                $(document).ready(function() {
+                    alert('Gagal menambahkan akun. NPK sudah terdaftar.');                    
+                });
+              </script>";
+
+        echo "<a href='tabelmahasiswa.php'>Kembali</a>";
+        echo "ERROR MESSAGE: " . $e->getMessage();
+    }
 }
