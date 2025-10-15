@@ -4,6 +4,10 @@ if(!isset($_SESSION['user'])){
     header("Location: login.php");
 }
 
+if(isset($_GET['status']) && $_GET['status'] == 'success'){
+    echo "<script>alert('Berhasil Update Password');</script>";
+}
+
 $username = $_SESSION['user'];
 ?>
 <!DOCTYPE html>
@@ -44,7 +48,9 @@ $username = $_SESSION['user'];
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        .btn-change-password>a {
+        .btn-change-password>button {
+            background-color: transparent;
+            border: none;
             color: #ffffff;
             text-decoration: none;
             font-size: 16px;
@@ -62,11 +68,10 @@ $username = $_SESSION['user'];
         <h3>Homepage</h3>
         <form action="change_password.php" method="POST">
             <div class="btn-change-password">
-                <a href="change_password.php">Change Password</a>                                
                 <input type="hidden" name="username" value="<?php echo(htmlspecialchars($username));?>">
+                <button type="submit" name="submit">Change Password</button>               
             </div>            
         </form>
     </header>
 </body>
-
 </html>

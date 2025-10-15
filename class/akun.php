@@ -9,7 +9,7 @@ class Akun extends classParent
     }
 
     public function login($username, $plainpwd)
-    {        
+    {
         $sql = "SELECT * from akun WHERE username=?";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("s", $username);
@@ -18,13 +18,13 @@ class Akun extends classParent
         if ($row = $res->fetch_assoc()) {
             $is_authenticated = password_verify($plainpwd, $row['password']);
             return ($is_authenticated) ? $row : false;
-        } else {            
+        } else {
             return false;
         }
     }
 
     public function insertAkunDosen($username, $plainpwd, $npk_dosen)
-    {        
+    {
         $stmt = $this->mysqli->prepare("INSERT INTO akun (username, password, npk_dosen) VALUES (?, ?, ?)");
         $encrypted_pwd = password_hash($plainpwd, PASSWORD_DEFAULT);
         $stmt->bind_param("sss", $username, $encrypted_pwd, $npk_dosen);
@@ -33,11 +33,22 @@ class Akun extends classParent
     }
 
     public function insertAkunMahasiswa($username, $plainpwd, $nrp_mahasiswa)
-    {        
+    {
         $stmt = $this->mysqli->prepare("INSERT INTO akun (username, password, nrp_mahasiswa) VALUES (?, ?, ?)");
         $encrypted_pwd = password_hash($plainpwd, PASSWORD_DEFAULT);
         $stmt->bind_param("sss", $username, $encrypted_pwd, $nrp_mahasiswa);
-        $stmt->execute();                
+        $stmt->execute();
         $stmt->close();
-    }    
+    }
+
+    public function changePassword($username, $new_password)
+    {
+        $sql = "UPDATE akun SET password=? WHERE username=?";
+        $stmt = $this->mysqli->prepare($sql);
+        $encrypted_pwd = password_hash($new_password, PASSWORD_DEFAULT);
+        $stmt->bind_param("ss", $encrypted_pwd, $username);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
 }
