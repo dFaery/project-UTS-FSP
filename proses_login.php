@@ -18,20 +18,17 @@ if (isset($_POST['login'])) {
     $password = $_POST['password'];
 
     $result = $akun->login($username, $password);
+    if ($result === false) {
+        echo "Account not found";
+        echo $username . ":" . $password;
+    } else {
+        $_SESSION['user'] = $result['username'];
+        $_SESSION['is_admin'] = $result['isadmin'];
 
-    if ($result->num_rows > 0) {
-        $user_data = $result->fetch_assoc();
-
-        $_SESSION['user'] = $user_data['username'];
-        $_SESSION['is_admin'] = $user_data['isadmin'];
-
-        if ($user_data['isadmin'] == 1) {
+        if ($result['isadmin'] == 1) {
             header("Location: adminhome.php");
         } else {
-            header("Location: home.php");
+            header("Location: index.php");
         }
-    } else {
-        echo "Account not found";
     }
 }
-?>

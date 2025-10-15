@@ -3,6 +3,8 @@ session_start();
 if(!isset($_SESSION['user'])){
     header("Location: login.php");
 }
+
+$username = $_SESSION['user'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -58,8 +60,11 @@ if(!isset($_SESSION['user'])){
 <body>
     <header>
         <h3>Homepage</h3>
-        <form action="change_password.php">
-            <div class="btn-change-password"><a href="change_password.php">Change Password</a></div>
+        <form action="change_password.php" method="POST">
+            <div class="btn-change-password">
+                <a href="change_password.php">Change Password</a>                                
+                <input type="hidden" name="username" value="<?php echo(htmlspecialchars($username));?>">
+            </div>            
         </form>
     </header>
 </body>
