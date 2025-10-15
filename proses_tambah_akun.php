@@ -52,7 +52,7 @@ if (isset($_POST['submit_dosen'])) {
                 });
               </script>";
 
-        echo "<a href='tabelmahasiswa.php'>Kembali</a>";
+        echo "<a href='tabelmahasiswa.php'>Kembali</a>";        
         echo "ERROR MESSAGE: " . $e->getMessage();
     }
 }
