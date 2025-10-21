@@ -1,7 +1,13 @@
     <?php
     session_start();
-        if(!isset($_SESSION['user'])){
+    if (!isset($_SESSION['user'])) {
         header("Location: login.php");
+    } else {
+        $username = $_SESSION['user'];
+        $isadmin = $_SESSION['is_admin'];                
+        if ($isadmin == 1) {
+            header("Location: adminhome.php");
+        }
     }
     $username = $_POST['username'];
     ?>
@@ -37,7 +43,8 @@
                 color: #2c3e50;
             }
 
-            .form-group, .form-group-warning-msg {
+            .form-group,
+            .form-group-warning-msg {
                 margin-bottom: 20px;
             }
 
@@ -73,7 +80,7 @@
             .change_password {
                 background-color: #686868ff;
                 flex-grow: 1;
-                width: 100%;                
+                width: 100%;
             }
 
             .btn-back {
@@ -130,7 +137,7 @@
                         $('.change_password').css("background-color", "#2ecc71");
                     }
                 });
-                
+
                 $('.change_password').click(function(e) {
                     if ($('#password').val() !== $('#re_enter_password').val()) {
                         e.preventDefault();

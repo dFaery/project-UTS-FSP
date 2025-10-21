@@ -1,11 +1,21 @@
 <?php
-session_start(); 
-if(!isset($_SESSION['user'])){
+session_start();
+if (!isset($_SESSION['user'])) {
     header("Location: login.php");
+} else {
+    $username = $_SESSION['user'];
+    $isadmin = $_SESSION['is_admin'];
+    if ($isadmin == 1) {
+        header("Location: adminhome.php");
+    }
 }
 
-if(isset($_GET['status']) && $_GET['status'] == 'success'){
+if (isset($_GET['status']) && $_GET['status'] == 'success') {
     echo "<script>alert('Berhasil Update Password');</script>";
+}
+
+if (isset($_GET['status']) && $_GET['status'] == 'fail') {
+    echo "<script>alert('Gagal Update Password');</script>";
 }
 
 $username = $_SESSION['user'];
@@ -54,7 +64,7 @@ $username = $_SESSION['user'];
             color: #ffffff;
             text-decoration: none;
             font-size: 16px;
-        }       
+        }
 
         .btn-change-password:hover {
             background-color: #2980b9;
@@ -68,10 +78,11 @@ $username = $_SESSION['user'];
         <h3>Homepage</h3>
         <form action="change_password.php" method="POST">
             <div class="btn-change-password">
-                <input type="hidden" name="username" value="<?php echo(htmlspecialchars($username));?>">
-                <button type="submit" name="submit">Change Password</button>               
-            </div>            
+                <input type="hidden" name="username" value="<?php echo (htmlspecialchars($username)); ?>">
+                <button type="submit" name="submit">Change Password</button>
+            </div>
         </form>
     </header>
 </body>
+
 </html>

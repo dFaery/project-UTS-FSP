@@ -10,8 +10,12 @@ if(isset($_SESSION['user'])){
 else{
     header("Location: login.php");
 }
-
 require_once("class/dosen.php");
+
+if(isset($_GET['dstatus'])){
+    if($_GET['dstatus'] == 'success') echo "<script>alert('Berhasil menambahkan akun Dosen');</script>";
+    if($_GET['dstatus'] == 'fail') echo "<script>alert('Gagal menambahkan akun Dosen, NPK sudah terdaftar');</script>";
+}
 
 $mysqli = new mysqli("localhost", "root", "", "fullstack");
 if ($mysqli->connect_errno) {
@@ -267,7 +271,7 @@ $PER_PAGE = 5;
 
                         echo "<tr>";
                         echo "<td>";
-                        $foto_path = "images/" . $npk . "." . $foto_ext;
+                        $foto_path = "images/" . $npk . '_' . $nama . '.' . $foto_ext;;
                         if (file_exists($foto_path) && !empty($foto_ext)) {
                             echo "<img src='" . htmlspecialchars($foto_path) . "' alt='Foto " . htmlspecialchars($nama) . "' class='photo-thumbnail'>";
                         } else {
@@ -279,7 +283,7 @@ $PER_PAGE = 5;
                         echo "<td>" . htmlspecialchars($nama) . "</td>";
                         echo "<td>";
                         echo "<a href='editdosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn edit-btn'>Edit</a> | ";
-                        echo "<a href='hapusdosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
+                        echo "<a href='proses_hapus_dosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
                         echo "</td>";
                         echo "</tr>";
                     }
