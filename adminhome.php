@@ -78,6 +78,12 @@ else{
         .btn.mahasiswa:hover {
             background-color: #27ae60;
         }
+        .btn.logout {
+            background-color: #cf2424ff;
+        }
+        .btn.logout:hover {
+            background-color: #b53e29ff;
+        }
     </style>
 </head>
 <body>
@@ -90,6 +96,7 @@ else{
         <div class="button-group">
             <a href="tabeldosen.php" class="btn">Kelola Tabel Dosen</a>
             <a href="tabelmahasiswa.php" class="btn mahasiswa">Kelola Tabel Mahasiswa</a>
+            <a href="proses_logout.php" class="btn logout">Logout</a>
         </div>
     </div>
 </body>

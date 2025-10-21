@@ -70,6 +70,35 @@ $username = $_SESSION['user'];
             background-color: #2980b9;
             transform: scale(1.02);
         }
+
+        .btn-logout {
+            padding: 12px 16px 12px 16px;
+            margin-top: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            color: #fff;
+            background-color: #cf2424ff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .btn-logout>a {
+            background-color: transparent;
+            border: none;
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .btn-logout:hover {
+            background-color: #b53e29ff;
+            transform: scale(1.02);
+        }
+
     </style>
 </head>
 
@@ -80,6 +109,9 @@ $username = $_SESSION['user'];
             <div class="btn-change-password">
                 <input type="hidden" name="username" value="<?php echo (htmlspecialchars($username)); ?>">
                 <button type="submit" name="submit">Change Password</button>
+            </div>
+            <div class="btn-logout">
+                <a href="proses_logout.php" class="btn-logout">Logout</a>
             </div>
         </form>
     </header>
