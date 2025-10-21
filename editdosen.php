@@ -16,7 +16,7 @@ $dosen = new Dosen();
 
 // Ambil NPK dari URL
 if (!isset($_GET['npk'])) {
-    die("NPK tidak ditemukan.");
+    die("NPK tidak ditemukan.");    
 }
 $npk_to_edit = $_GET['npk'];
 
@@ -120,12 +120,13 @@ $dosen = $result->fetch_assoc();
             <div class="form-group">
                 <label for="nama">Nama Lengkap</label>
                 <input type="text" id="nama" name="nama" value="<?php echo htmlspecialchars($dosen['nama']); ?>" required>
+                <input type="hidden" name="nama_lama" value="<?php echo htmlspecialchars($dosen['nama']); ?>">
             </div>
             <div class="form-group">
                 <label for="foto">Ganti Foto (Kosongkan jika tidak ingin ganti)</label>
                 <?php
                 if (!empty($dosen['foto_extension'])) {
-                    $foto_path = "images/" . $dosen['npk'] . "." . $dosen['foto_extension'];
+                    $foto_path = "images/" . $dosen['npk'] . "_". $dosen['nama'] . "." . $dosen['foto_extension'];
                     echo "<img src='" . $foto_path . "' alt='Foto saat ini' class='current-photo'>";
                 }
                 ?>
@@ -133,7 +134,7 @@ $dosen = $result->fetch_assoc();
             </div>
             <div class="btn-group">
                 <a href="tabeldosen.php" class="btn btn-back">Batal</a>
-                <button type="submit" class="btn btn-save">Update Data</button>
+                <button type="submit" class="btn btn-save" name="update-dosen">Update Data</button>
             </div>
         </form>
     </div>

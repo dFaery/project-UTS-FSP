@@ -36,7 +36,7 @@ else{
         <form action="tambahakun.php" method="POST" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="npk">NPK</label>
-                <input type="text" id="npk" name="npk" required maxlength="5">
+                <input type="text" id="npk" name="npk" required maxlength="6">
             </div>
             <div class="form-group">
                 <label for="nama">Nama Lengkap</label>

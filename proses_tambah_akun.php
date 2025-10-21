@@ -19,16 +19,11 @@ if (isset($_POST['submit_dosen'])) {
     try {
         $dosen->insertDosen($npk, $nama, $foto_extension);
         $akun->insertAkunDosen($username, $password, $npk);
-        header("Location: tabeldosen.php");
+        header("Location: tabeldosen.php?dstatus=success");
+        exit;
     } catch (Exception $e) {
-        echo "<script>
-        $(document).ready(function() {
-            alert('Gagal menambahkan akun. NPK sudah terdaftar.');                    
-            });
-            </script>";
-            
-        echo "ERROR MESSAGE: " . $e->getMessage();
-        echo "<a href='tabeldosen.php'>Kembali</a>";
+        header("Location: tabeldosen.php?dstatus=fail");
+        exit;
     }
 } else if (isset($_POST['submit_mahasiswa'])) {
     $mahasiswa = new Mahasiswa();
@@ -41,18 +36,13 @@ if (isset($_POST['submit_dosen'])) {
     $foto_extension = $_POST['foto_extension'];
 
     try {
-        
+
         $mahasiswa->insertMahasiswa($nrp, $nama, $gender, $tanggal_lahir, $angkatan, $foto_extension);
         $akun->insertAkunMahasiswa($username, $password, $nrp);
-        header("Location: tabelmahasiswa.php");
+        header("Location: tabelmahasiswa.php?mstatus=success");
+        exit;
     } catch (Exception $e) {
-        echo "<script>
-                $(document).ready(function() {
-                    alert('Gagal menambahkan akun. NPK sudah terdaftar.');                    
-                });
-              </script>";
-
-        echo "<a href='tabelmahasiswa.php'>Kembali</a>";        
-        echo "ERROR MESSAGE: " . $e->getMessage();
+        header("Location: tabelmahasiswa.php?mstatus=fail");
+        exit;
     }
 }

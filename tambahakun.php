@@ -1,13 +1,12 @@
 <?php
 session_start();
-if(isset($_SESSION['user'])){
+if (isset($_SESSION['user'])) {
     $username = $_SESSION['user'];
     $isadmin = $_SESSION['is_admin'];
-    if($isadmin != 1){
+    if ($isadmin != 1) {
         header("Location: login.php");
     }
-}
-else{
+} else {
     header("Location: login.php");
 }
 
@@ -38,7 +37,7 @@ if (isset($_POST['submit-dosen'])) {
 
         if (in_array($extension, $allowed_extensions)) {
             $foto_extension = $extension;
-            $target_file = "images/" . $npk . '.' . $foto_extension;
+            $target_file = "images/" . $npk . '_' . $nama . '.' . $foto_extension;
 
             if (!move_uploaded_file($_FILES['foto']['tmp_name'], $target_file)) {
                 die("Gagal mengupload file.");
@@ -58,7 +57,7 @@ if (isset($_POST['submit-dosen'])) {
 
         if (in_array($extension, $allowed_extensions)) {
             $foto_extension = $extension;
-            $target_file = "images/" . $nrp . '.' . $foto_extension;
+            $target_file = "images/" . $nrp . "." . $foto_extension;
 
             if (!move_uploaded_file($_FILES['foto']['tmp_name'], $target_file)) {
                 die("Gagal mengupload file.");
@@ -156,8 +155,12 @@ if (isset($_POST['submit-dosen'])) {
 
             <div class="form-group">
                 <label for="npk">NPK / NRP</label>
-                <input type="text" id="npk" name="<?php if (isset($npk)) { echo 'npk'; } else if (isset($nrp)) { echo 'nrp';}?>" 
-                value="<?php echo htmlspecialchars($id); ?>" readonly>
+                <input type="text" id="npk" name="<?php if (isset($npk)) {
+                                                        echo 'npk';
+                                                    } else if (isset($nrp)) {
+                                                        echo 'nrp';
+                                                    } ?>"
+                    value="<?php echo htmlspecialchars($id); ?>" readonly>
             </div>
 
             <div class="form-group">

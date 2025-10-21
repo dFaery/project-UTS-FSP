@@ -11,6 +11,11 @@ else{
     header("Location: login.php");
 }
 
+if(isset($_GET['mstatus'])){
+    if($_GET['mstatus'] == 'success') echo "<script>alert('Berhasil menambahkan akun Mahasiswa');</script>";
+    if($_GET['mstatus'] == 'fail') echo "<script>alert('Gagal menambahkan akun Mahasiswa, NRP sudah terdaftar');</script>";
+}
+
 require_once("class/mahasiswa.php");
 
 $mysqli = new mysqli("localhost", "root", "", "fullstack");
@@ -284,7 +289,7 @@ $PER_PAGE = 5;
                         echo "<td>" . htmlspecialchars($angkatan) . "</td>";
                         echo "<td>";
                         echo "<a href='editmahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn edit-btn'>Edit</a> | ";
-                        echo "<a href='hapusmahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
+                        echo "<a href='proses_hapus_mahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
                         echo "</td>";
                         echo "</tr>";
                     }
