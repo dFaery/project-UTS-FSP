@@ -1,5 +1,13 @@
 <?php
 session_start();
+if(isset($_SESSION['user'])){
+    $isadmin = $_SESSION['is_admin'];
+    if($isadmin != 1){
+        header("Location: index.php");
+    } else {
+        header("Location: adminhome.php");
+    }
+}
 ?>
 
 <!DOCTYPE html>
