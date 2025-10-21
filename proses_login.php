@@ -19,8 +19,9 @@ if (isset($_POST['login'])) {
 
     $result = $akun->login($username, $password);
     if ($result === false) {
-        echo "Account not found";
+        echo "Account not found ";
         echo $username . ":" . $password;
+        echo "<br><a href='login.php'>Kembali ke Halaman Login</a>";
     } else {
         $_SESSION['user'] = $result['username'];
         $_SESSION['is_admin'] = $result['isadmin'];
