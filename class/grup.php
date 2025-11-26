@@ -21,6 +21,12 @@ class Grup extends classParent
         return false;
     }
 
+    public function deleteGrup($idgrup, $username_pembuat) {
+        $stmt = $this->mysqli->prepare("DELETE FROM grup WHERE idgrup = ? AND username_pembuat = ?");
+        $stmt->bind_param("is", $idgrup, $username_pembuat);
+        return $stmt->execute();
+    }
+
     public function getGrupByDosen($username) {
         $stmt = $this->mysqli->prepare("SELECT * FROM grup WHERE username_pembuat = ? ORDER BY tanggal_pembentukan DESC");
         $stmt->bind_param("s", $username);

@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
-// 2. Cek apakah Admin
+// 2. Cek Admin (Redirect jika admin)
 if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
     header("Location: adminhome.php");
     exit();
@@ -17,7 +17,7 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
 $username = $_SESSION['user'];
 $grupObj = new Grup();
 
-// 3. Cek Role (Apakah Dosen atau Mahasiswa)
+// 3. Cek Role (Dosen atau Mahasiswa)
 $isDosen = $grupObj->isDosen($username);
 $pesan = "";
 
@@ -27,22 +27,28 @@ if ($isDosen && isset($_POST['btnSimpanGrup'])) {
     $deskripsi = $_POST['deskripsi'];
     $jenis = $_POST['jenis']; // Public/Private
 
-    // Panggil method dari Class Grup
     $kode_baru = $grupObj->createGrup($username, $nama, $deskripsi, $jenis);
     
     if ($kode_baru) {
-        // Tampilkan alert JS sukses
         $pesan = "<script>alert('Grup Berhasil Dibuat! Kode Join: $kode_baru'); window.location.href='index.php';</script>";
     } else {
         $pesan = "<script>alert('Gagal membuat grup.');</script>";
     }
 }
 
+// --- LOGIC DOSEN: HAPUS GRUP ---
+if ($isDosen && isset($_GET['hapus_grup'])) {
+    $id_hapus = $_GET['hapus_grup'];
+    if($grupObj->deleteGrup($id_hapus, $username)){
+         $pesan = "<script>alert('Grup berhasil dihapus!'); window.location.href='index.php';</script>";
+    } else {
+         $pesan = "<script>alert('Gagal menghapus grup.');</script>";
+    }
+}
+
 // --- LOGIC MAHASISWA: JOIN GRUP ---
 if (!$isDosen && isset($_POST['btnJoin'])) {
     $kode_input = $_POST['kode_join'];
-    
-    // Panggil method dari Class Grup
     if($grupObj->joinGrup($username, $kode_input)){
         $pesan = "<script>alert('Berhasil bergabung ke grup!'); window.location.href='index.php';</script>";
     } else {
@@ -66,7 +72,7 @@ if (!$isDosen && isset($_POST['btnJoin'])) {
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px; /* Diperlebar sedikit agar tabel lega */
             margin: 0 auto;
             background-color: #fff;
             padding: 30px;
@@ -80,7 +86,7 @@ if (!$isDosen && isset($_POST['btnJoin'])) {
 
         /* Tombol */
         .btn {
-            padding: 10px 15px;
+            padding: 8px 12px;
             border: none;
             border-radius: 5px;
             color: white;
@@ -90,10 +96,10 @@ if (!$isDosen && isset($_POST['btnJoin'])) {
             font-size: 14px;
             font-weight: bold;
         }
-        .btn-logout { background-color: #e74c3c; float: right; }
+        .btn-logout { background-color: #e74c3c; float: right; padding: 10px 20px; }
         .btn-logout:hover { background-color: #c0392b; }
         
-        .btn-save { background-color: #2ecc71; width: 100%; }
+        .btn-save { background-color: #2ecc71; width: 100%; padding: 12px; font-size: 16px; }
         .btn-save:hover { background-color: #27ae60; }
         
         .btn-kelola { background-color: #3498db; }
@@ -127,6 +133,7 @@ if (!$isDosen && isset($_POST['btnJoin'])) {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
+            table-layout: fixed; /* Agar lebar kolom konsisten */
         }
         
         th {
@@ -135,13 +142,15 @@ if (!$isDosen && isset($_POST['btnJoin'])) {
             padding: 12px;
             text-align: left;
             text-transform: uppercase;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
         
         td {
             padding: 12px;
             border-bottom: 1px solid #ddd;
             color: #333;
+            vertical-align: middle;
+            word-wrap: break-word; /* Agar teks panjang turun ke bawah */
         }
         
         tr:nth-child(even) { background-color: #f9f9f9; }
@@ -156,6 +165,7 @@ if (!$isDosen && isset($_POST['btnJoin'])) {
             font-family: monospace;
             font-size: 1.1em;
             letter-spacing: 1px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -201,11 +211,11 @@ if (!$isDosen && isset($_POST['btnJoin'])) {
             <table>
                 <thead>
                     <tr>
-                        <th width="5%">No</th>
-                        <th width="25%">Nama Grup</th>
-                        <th width="15%">Kode Join</th>
-                        <th width="35%">Deskripsi</th>
-                        <th width="20%" style="text-align: center;">Aksi</th>
+                        <th width="5%">NO</th>
+                        <th width="20%">NAMA GRUP</th>
+                        <th width="15%">KODE JOIN</th>
+                        <th width="35%">DESKRIPSI</th>
+                        <th width="25%" style="text-align: center;">AKSI</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -217,15 +227,27 @@ if (!$isDosen && isset($_POST['btnJoin'])) {
                         $no = 1;
                         while ($row = $res->fetch_assoc()) {
                             echo "<tr>";
+                            // 1. No
                             echo "<td>" . $no++ . "</td>";
+                            
+                            // 2. Nama Grup
                             echo "<td><b>" . htmlspecialchars($row['nama']) . "</b></td>";
-                            // Tampilkan Kode
+                            
+                            // 3. Kode Join
                             echo "<td><span class='badge-code'>" . $row['kode_pendaftaran'] . "</span></td>";
+                            
+                            // 4. Deskripsi
                             echo "<td>" . htmlspecialchars($row['deskripsi']) . "</td>";
                             
-                            // Tombol Kelola -> Menuju detail_grup.php?id=...
+                            // 5. Aksi (Kelola & Hapus)
                             echo "<td style='text-align: center;'>";
-                            echo "<a href='detail_grup.php?id=" . $row['idgrup'] . "' class='btn btn-kelola'>⚙️ Kelola</a>";
+                                echo "<a href='detail_grup.php?id=" . $row['idgrup'] . "' class='btn btn-kelola'>⚙️ Kelola</a> ";
+                                echo "<a href='index.php?hapus_grup=" . $row['idgrup'] . "' 
+                                         class='btn btn-logout' 
+                                         style='padding:8px 10px; font-size:14px; float:none;' 
+                                         onclick='return confirm(\"Yakin ingin membubarkan grup ini? Semua data event dan member di dalamnya akan terhapus.\")'>
+                                         🗑️ Hapus
+                                      </a>";
                             echo "</td>";
                             echo "</tr>";
                         }
@@ -249,7 +271,7 @@ if (!$isDosen && isset($_POST['btnJoin'])) {
                         <label>Masukkan Kode Pendaftaran</label>
                         <div style="display: flex; gap: 10px;">
                             <input type="text" name="kode_join" placeholder="Contoh: X7Z9A2" required maxlength="6" style="text-transform: uppercase;">
-                            <button type="submit" name="btnJoin" class="btn btn-save" style="width: auto;">Join</button>
+                            <button type="submit" name="btnJoin" class="btn btn-save" style="width: auto; padding: 0 30px;">Join</button>
                         </div>
                         <small style="color: gray;">Kode pendaftaran bisa didapatkan dari Dosen pengampu.</small>
                     </div>

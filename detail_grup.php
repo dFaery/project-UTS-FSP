@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once("class/Grup.php");
-require_once("class/Event.php"); // Load class Event
+require_once("class/Event.php");
 
 if (!isset($_SESSION['user'])) { header("Location: login.php"); exit(); }
 if (!isset($_GET['id'])) { die("ID Grup tidak ditemukan."); }
@@ -10,25 +10,34 @@ $idgrup = $_GET['id'];
 $username = $_SESSION['user'];
 
 $grupObj = new Grup();
-$eventObj = new Event(); // Instance Event
+$eventObj = new Event();
 
 // Ambil Data Grup
 $grup = $grupObj->getGrupById($idgrup);
 if(!$grup) die("Grup tidak ditemukan.");
 
-// Cek Permission
+// Cek Role
 $isPembuat = ($grup['username_pembuat'] == $username);
 
-// tambah event
-if ($isPembuat && isset($_POST['btnTambahEvent'])) {
-    $eventObj->addEvent($idgrup, $_POST['judul'], $_POST['tanggal'], $_POST['keterangan']);
-    header("Location: detail_grup.php?id=$idgrup"); // Refresh
+// --- LOGIC 1: USER KELUAR GRUP (LEAVE) ---
+if (isset($_GET['action']) && $_GET['action'] == 'leave') {
+    // User menghapus dirinya sendiri dari grup
+    if($grupObj->removeMember($idgrup, $username)){
+        echo "<script>alert('Anda telah keluar dari grup.'); window.location.href='index.php';</script>";
+        exit();
+    }
 }
 
-// hapus member
+// --- LOGIC 2: HAPUS MEMBER (KICK) - Khusus Pembuat ---
 if ($isPembuat && isset($_GET['kick_user'])) {
     $grupObj->removeMember($idgrup, $_GET['kick_user']);
-    header("Location: detail_grup.php?id=$idgrup"); // Refresh
+    header("Location: detail_grup.php?id=$idgrup");
+}
+
+// --- LOGIC 3: TAMBAH EVENT - Khusus Pembuat ---
+if ($isPembuat && isset($_POST['btnTambahEvent'])) {
+    $eventObj->addEvent($idgrup, $_POST['judul'], $_POST['tanggal'], $_POST['keterangan']);
+    header("Location: detail_grup.php?id=$idgrup");
 }
 ?>
 
@@ -40,13 +49,16 @@ if ($isPembuat && isset($_GET['kick_user'])) {
     <style>
         body { font-family: sans-serif; background: #f0f2f5; padding: 20px; }
         .container { max-width: 1100px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .header-grup { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .header-grup { border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .row { display: flex; gap: 20px; }
         .col { flex: 1; padding: 15px; background: #f9f9f9; border-radius: 8px; border: 1px solid #eee; }
+        
         .btn { padding: 8px 12px; border-radius: 4px; text-decoration: none; color: white; border: none; cursor: pointer; }
         .btn-back { background: #7f8c8d; }
+        .btn-leave { background: #c0392b; } /* Merah Gelap */
         .btn-add { background: #2ecc71; width:100%; margin-top:5px; }
         .btn-kick { background: #e74c3c; font-size: 0.8em; }
+        
         input, textarea { width: 100%; margin-bottom: 10px; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; }
         table { width: 100%; border-collapse: collapse; background: white; margin-top:10px; }
         td, th { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; font-size: 0.9em; }
@@ -58,12 +70,20 @@ if ($isPembuat && isset($_GET['kick_user'])) {
 
 <div class="container">
     <div class="header-grup">
-        <a href="index.php" class="btn btn-back">Kembali</a>
-        <h1><?= htmlspecialchars($grup['nama']) ?></h1>
-        <?php if($isPembuat): ?>
-            <p>Kode Join: <strong style="font-size:1.2em; background:#eee; padding:5px;"><?= $grup['kode_pendaftaran'] ?></strong></p>
-        <?php else: ?>
-            <p>Dosen Pengampu: <strong><?= $grup['username_pembuat'] ?></strong></p>
+        <div>
+            <a href="index.php" class="btn btn-back">Kembali</a>
+            <h1 style="margin: 10px 0;"><?= htmlspecialchars($grup['nama']) ?></h1>
+            <?php if($isPembuat): ?>
+                <p>Kode Join: <strong style="font-size:1.2em; background:#eee; padding:5px;"><?= $grup['kode_pendaftaran'] ?></strong></p>
+            <?php else: ?>
+                <p>Dosen Pengampu: <strong><?= $grup['username_pembuat'] ?></strong></p>
+            <?php endif; ?>
+        </div>
+
+        <?php if(!$isPembuat): ?>
+            <a href="?id=<?= $idgrup ?>&action=leave" class="btn btn-leave" onclick="return confirm('Yakin ingin keluar dari grup ini? Anda harus memasukkan kode lagi jika ingin bergabung kembali.')">
+                🚪 Keluar Grup
+            </a>
         <?php endif; ?>
     </div>
 
@@ -83,7 +103,6 @@ if ($isPembuat && isset($_GET['kick_user'])) {
                 <tr><th>Tanggal</th><th>Event</th></tr>
                 <?php
                 $resEvent = $eventObj->getEventsByGrup($idgrup);
-                
                 if($resEvent->num_rows > 0){
                     while($e = $resEvent->fetch_assoc()) {
                         echo "<tr><td>{$e['tanggal']}</td><td><b>{$e['judul']}</b><br><small>{$e['keterangan']}</small></td></tr>";
@@ -110,7 +129,6 @@ if ($isPembuat && isset($_GET['kick_user'])) {
                 <tr><th>NRP</th><th>Nama</th><?php if($isPembuat) echo "<th>Aksi</th>"; ?></tr>
                 <?php
                 $resM = $grupObj->getMembers($idgrup);
-                
                 if($resM->num_rows > 0){
                     while($m = $resM->fetch_assoc()){
                         echo "<tr>
@@ -144,7 +162,6 @@ $(document).ready(function(){
             });
         } else { $('#search-result').hide(); }
     });
-
     $(document).on('click', '.add-btn-ajax', function(){
         let user = $(this).data('user');
         let idgrup = <?= $idgrup ?>;
