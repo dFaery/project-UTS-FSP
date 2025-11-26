@@ -1,120 +1,301 @@
 <?php
 session_start();
+require_once("class/Grup.php");
+
+// 1. Cek Login
 if (!isset($_SESSION['user'])) {
     header("Location: login.php");
-} else {
-    $username = $_SESSION['user'];
-    $isadmin = $_SESSION['is_admin'];
-    if ($isadmin == 1) {
-        header("Location: adminhome.php");
-    }
+    exit();
 }
 
-if (isset($_GET['status']) && $_GET['status'] == 'success') {
-    echo "<script>alert('Berhasil Update Password');</script>";
-}
-
-if (isset($_GET['status']) && $_GET['status'] == 'fail') {
-    echo "<script>alert('Gagal Update Password');</script>";
+// 2. Cek apakah Admin
+if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
+    header("Location: adminhome.php");
+    exit();
 }
 
 $username = $_SESSION['user'];
+$grupObj = new Grup();
+
+// 3. Cek Role (Apakah Dosen atau Mahasiswa)
+$isDosen = $grupObj->isDosen($username);
+$pesan = "";
+
+// --- LOGIC DOSEN: TAMBAH GRUP ---
+if ($isDosen && isset($_POST['btnSimpanGrup'])) {
+    $nama = $_POST['nama_grup'];
+    $deskripsi = $_POST['deskripsi'];
+    $jenis = $_POST['jenis']; // Public/Private
+
+    // Panggil method dari Class Grup
+    $kode_baru = $grupObj->createGrup($username, $nama, $deskripsi, $jenis);
+    
+    if ($kode_baru) {
+        // Tampilkan alert JS sukses
+        $pesan = "<script>alert('Grup Berhasil Dibuat! Kode Join: $kode_baru'); window.location.href='index.php';</script>";
+    } else {
+        $pesan = "<script>alert('Gagal membuat grup.');</script>";
+    }
+}
+
+// --- LOGIC MAHASISWA: JOIN GRUP ---
+if (!$isDosen && isset($_POST['btnJoin'])) {
+    $kode_input = $_POST['kode_join'];
+    
+    // Panggil method dari Class Grup
+    if($grupObj->joinGrup($username, $kode_input)){
+        $pesan = "<script>alert('Berhasil bergabung ke grup!'); window.location.href='index.php';</script>";
+    } else {
+        $pesan = "<script>alert('Gagal bergabung. Kode salah atau Anda sudah terdaftar.');</script>";
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Dashboard Utama</title>
     <style>
         body {
             font-family: sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
         }
 
-        h3 {
-            text-align: left;
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2, h3 {
             color: #2c3e50;
-            padding: 12px;
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0px 20px 0px 20px;
-        }
-
-        .btn-change-password {
-            padding: 12px 16px 12px 16px;
-            font-size: 1.1rem;
-            font-weight: bold;
+        /* Tombol */
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
             text-decoration: none;
-            color: #fff;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .btn-logout { background-color: #e74c3c; float: right; }
+        .btn-logout:hover { background-color: #c0392b; }
+        
+        .btn-save { background-color: #2ecc71; width: 100%; }
+        .btn-save:hover { background-color: #27ae60; }
+        
+        .btn-kelola { background-color: #3498db; }
+        .btn-kelola:hover { background-color: #2980b9; }
+
+        .btn-view { background-color: #f39c12; }
+
+        /* Form Styling */
+        .form-box {
+            background: #eef2f5;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+        
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        th {
             background-color: #3498db;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            text-transform: uppercase;
+            font-size: 0.9em;
         }
-
-        .btn-change-password>button {
-            background-color: transparent;
-            border: none;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 16px;
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            color: #333;
         }
+        
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #f1f1f1; }
 
-        .btn-change-password:hover {
-            background-color: #2980b9;
-            transform: scale(1.02);
-        }
-
-        .btn-logout {
-            padding: 12px 16px 12px 16px;
-            margin-top: 14px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            text-decoration: none;
-            text-align: center;
+        /* Badge Kode */
+        .badge-code {
+            background-color: #2c3e50;
             color: #fff;
-            background-color: #cf2424ff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 1.1em;
+            letter-spacing: 1px;
         }
-
-        .btn-logout>a {
-            background-color: transparent;
-            border: none;
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 16px;
-        }
-
-        .btn-logout:hover {
-            background-color: #b53e29ff;
-            transform: scale(1.02);
-        }
-
     </style>
 </head>
-
 <body>
-    <header>
-        <h3>Homepage</h3>
-        <form action="change_password.php" method="POST">
-            <div class="btn-change-password">
-                <input type="hidden" name="username" value="<?php echo (htmlspecialchars($username)); ?>">
-                <button type="submit" name="submit">Change Password</button>
-            </div>
-            <div class="btn-logout">
-                <a href="proses_logout.php" class="btn-logout">Logout</a>
-            </div>
-        </form>
-    </header>
-</body>
+    
+    <?= $pesan ?>
 
+    <div class="container">
+        <a href="proses_logout.php" class="btn btn-logout">Logout</a>
+
+        <?php if ($isDosen): ?>
+            
+            <h1>Dashboard Dosen</h1>
+            <p>Selamat datang, <b><?= htmlspecialchars($username) ?></b>. Kelola kelas Anda di sini.</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+
+            <div class="form-box">
+                <h3 style="margin-top:0;">+ Buat Grup Baru</h3>
+                <form method="POST">
+                    <div class="form-group">
+                        <label>Nama Grup / Mata Kuliah</label>
+                        <input type="text" name="nama_grup" required placeholder="Contoh: Pemrograman Web A">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Jenis Grup</label>
+                        <select name="jenis">
+                            <option value="Public">Public</option>
+                            <option value="Private">Private</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Deskripsi (Opsional)</label>
+                        <textarea name="deskripsi" rows="2" placeholder="Deskripsi singkat tentang grup ini..."></textarea>
+                    </div>
+
+                    <button type="submit" name="btnSimpanGrup" class="btn btn-save">Buat Grup Sekarang</button>
+                </form>
+            </div>
+
+            <h3>Daftar Grup Saya</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="5%">No</th>
+                        <th width="25%">Nama Grup</th>
+                        <th width="15%">Kode Join</th>
+                        <th width="35%">Deskripsi</th>
+                        <th width="20%" style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Ambil data grup milik dosen ini
+                    $res = $grupObj->getGrupByDosen($username);
+
+                    if ($res->num_rows > 0) {
+                        $no = 1;
+                        while ($row = $res->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td>" . $no++ . "</td>";
+                            echo "<td><b>" . htmlspecialchars($row['nama']) . "</b></td>";
+                            // Tampilkan Kode
+                            echo "<td><span class='badge-code'>" . $row['kode_pendaftaran'] . "</span></td>";
+                            echo "<td>" . htmlspecialchars($row['deskripsi']) . "</td>";
+                            
+                            // Tombol Kelola -> Menuju detail_grup.php?id=...
+                            echo "<td style='text-align: center;'>";
+                            echo "<a href='detail_grup.php?id=" . $row['idgrup'] . "' class='btn btn-kelola'>⚙️ Kelola</a>";
+                            echo "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='5' style='text-align:center; padding: 20px; color: gray;'>Belum ada grup yang dibuat. Silakan buat grup baru di atas.</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+
+        <?php else: ?>
+
+            <h1>Dashboard Mahasiswa</h1>
+            <p>Halo, <b><?= htmlspecialchars($username) ?></b>. Bergabunglah dengan kelas dosen Anda.</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 20px;">
+
+            <div class="form-box">
+                <h3 style="margin-top:0;">🔑 Gabung ke Grup</h3>
+                <form method="POST">
+                    <div class="form-group">
+                        <label>Masukkan Kode Pendaftaran</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" name="kode_join" placeholder="Contoh: X7Z9A2" required maxlength="6" style="text-transform: uppercase;">
+                            <button type="submit" name="btnJoin" class="btn btn-save" style="width: auto;">Join</button>
+                        </div>
+                        <small style="color: gray;">Kode pendaftaran bisa didapatkan dari Dosen pengampu.</small>
+                    </div>
+                </form>
+            </div>
+
+            <h3>Grup yang Diikuti</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="5%">No</th>
+                        <th width="25%">Nama Grup</th>
+                        <th width="20%">Dosen Pembuat</th>
+                        <th width="35%">Deskripsi</th>
+                        <th width="15%" style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    // Ambil data grup yang sudah di-join mahasiswa
+                    $res = $grupObj->getGrupByMahasiswa($username);
+
+                    if ($res->num_rows > 0) {
+                        $no = 1;
+                        while ($row = $res->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td>" . $no++ . "</td>";
+                            echo "<td><b>" . htmlspecialchars($row['nama']) . "</b></td>";
+                            echo "<td>" . htmlspecialchars($row['username_pembuat']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['deskripsi']) . "</td>";
+                            
+                            // Tombol Lihat -> Menuju detail_grup.php?id=... (Mode View Only untuk Mhs)
+                            echo "<td style='text-align: center;'>";
+                            echo "<a href='detail_grup.php?id=" . $row['idgrup'] . "' class='btn btn-view'>👁️ Lihat</a>";
+                            echo "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='5' style='text-align:center; padding: 20px; color: gray;'>Anda belum bergabung ke grup manapun.</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+
+        <?php endif; ?>
+    </div>
+
+</body>
 </html>
