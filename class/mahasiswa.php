@@ -7,7 +7,7 @@ class Mahasiswa extends classParent
     {
         parent::__construct();
     }
-
+    
     public function getMahasiswa($cari_mahasiswa, $nrp_to_edit = null, $offset = null, $limit = null)
     {
 
@@ -33,7 +33,7 @@ class Mahasiswa extends classParent
             return $stmt->get_result();
         }
         
-    }
+    } 
 
     public function insertMahasiswa($nrp, $nama, $gender, $tanggal_lahir, $angkatan, $foto_extension)
     {

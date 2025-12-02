@@ -3,7 +3,11 @@ require_once("classParent.php");
 
 class Grup extends classParent
 {
-    // Cek Dosen
+    public function generateKode() {
+        $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        return substr(str_shuffle($chars), 0, 6);
+    }
+
     public function isDosen($username) {
         $stmt = $this->mysqli->prepare("SELECT npk_dosen FROM akun WHERE username = ? AND npk_dosen IS NOT NULL");
         $stmt->bind_param("s", $username);
@@ -12,33 +16,21 @@ class Grup extends classParent
     }
 
     public function createGrup($username, $nama, $deskripsi, $jenis) {
-        $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $kode = substr(str_shuffle($chars), 0, 6); 
-
+        $kode = $this->generateKode();
         $stmt = $this->mysqli->prepare("INSERT INTO grup (username_pembuat, nama, deskripsi, tanggal_pembentukan, jenis, kode_pendaftaran) VALUES (?, ?, ?, NOW(), ?, ?)");
         $stmt->bind_param("sssss", $username, $nama, $deskripsi, $jenis, $kode);
         if($stmt->execute()) return $kode;
         return false;
     }
 
-    public function deleteGrup($idgrup, $username_pembuat) {
-        $stmt = $this->mysqli->prepare("DELETE FROM grup WHERE idgrup = ? AND username_pembuat = ?");
-        $stmt->bind_param("is", $idgrup, $username_pembuat);
+    public function updateGrup($idgrup, $nama, $deskripsi, $jenis) {
+        $stmt = $this->mysqli->prepare("UPDATE grup SET nama=?, deskripsi=?, jenis=? WHERE idgrup=?");
+        $stmt->bind_param("sssi", $nama, $deskripsi, $jenis, $idgrup);
         return $stmt->execute();
     }
-
+    
     public function getGrupByDosen($username) {
         $stmt = $this->mysqli->prepare("SELECT * FROM grup WHERE username_pembuat = ? ORDER BY tanggal_pembentukan DESC");
-        $stmt->bind_param("s", $username);
-        $stmt->execute();
-        return $stmt->get_result();
-    }
-
-    public function getGrupByMahasiswa($username) {
-        $sql = "SELECT g.* FROM grup g 
-                JOIN member_grup mg ON g.idgrup = mg.idgrup 
-                WHERE mg.username = ? ORDER BY g.tanggal_pembentukan DESC";
-        $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("s", $username);
         $stmt->execute();
         return $stmt->get_result();
@@ -50,32 +42,85 @@ class Grup extends classParent
         $stmt->execute();
         return $stmt->get_result()->fetch_assoc();
     }
+    
+    public function getJoinedGroups($username) {
+        $sql = "SELECT g.*, g.username_pembuat FROM grup g 
+                JOIN member_grup mg ON g.idgrup = mg.idgrup 
+                WHERE mg.username = ? ORDER BY g.tanggal_pembentukan DESC";
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
 
     public function joinGrup($username, $kode) {
-        // 1. Cek Kode
-        $stmt = $this->mysqli->prepare("SELECT idgrup FROM grup WHERE kode_pendaftaran = ?");
+        $stmt = $this->mysqli->prepare("SELECT idgrup, jenis, username_pembuat FROM grup WHERE kode_pendaftaran = ?");
         $stmt->bind_param("s", $kode);
         $stmt->execute();
         $res = $stmt->get_result();
         
         if($row = $res->fetch_assoc()){
             $idgrup = $row['idgrup'];
-            // 2. Cek Duplikasi
+            $jenis = $row['jenis']; 
+            $pembuat = $row['username_pembuat'];
+
+            if($pembuat == $username) {
+                return "OWNER";
+            }
+
+            if($jenis == 'Privat') {
+                return "PRIVAT"; 
+            }
+
             if(!$this->isMember($idgrup, $username)){
-                return $this->addMember($idgrup, $username);
+                if($this->addMember($idgrup, $username)){
+                    return "SUCCESS";
+                }
+            } else {
+                return "ALREADY_MEMBER";
             }
         }
-        return false;
+        return "NOT_FOUND";
     }
 
-    // --- MEMBER MANAGEMENT (Encapsulation Fix) ---
+    public function getAvailablePublicGroups($username) {
+        $sql = "SELECT g.*, d.nama as nama_dosen 
+                FROM grup g
+                JOIN akun a ON g.username_pembuat = a.username
+                JOIN dosen d ON a.npk_dosen = d.npk
+                WHERE g.jenis = 'Publik'
+                AND g.username_pembuat != ? 
+                AND g.idgrup NOT IN (SELECT idgrup FROM member_grup WHERE username = ?)
+                ORDER BY g.tanggal_pembentukan DESC";
+                
+        $stmt = $this->mysqli->prepare($sql);
+        $stmt->bind_param("ss", $username, $username);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
 
     public function getMembers($idgrup) {
-        $sql = "SELECT m.nrp, m.nama, a.username 
-                FROM member_grup mg 
-                JOIN akun a ON mg.username = a.username 
-                JOIN mahasiswa m ON a.nrp_mahasiswa = m.nrp 
-                WHERE mg.idgrup = ?";
+        $sql = "SELECT m.username, 
+                CASE 
+                    WHEN d.nama IS NOT NULL THEN d.nama 
+                    WHEN mhs.nama IS NOT NULL THEN mhs.nama 
+                    ELSE m.username 
+                END as nama_lengkap,
+                CASE 
+                    WHEN d.npk IS NOT NULL THEN d.npk 
+                    WHEN mhs.nrp IS NOT NULL THEN mhs.nrp 
+                    ELSE '-' 
+                END as id_nomor,
+                CASE 
+                    WHEN d.npk IS NOT NULL THEN 'Dosen' 
+                    ELSE 'Mahasiswa' 
+                END as role
+                FROM member_grup m
+                LEFT JOIN akun a ON m.username = a.username
+                LEFT JOIN dosen d ON a.npk_dosen = d.npk
+                LEFT JOIN mahasiswa mhs ON a.nrp_mahasiswa = mhs.nrp
+                WHERE m.idgrup = ?"; 
+        
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("i", $idgrup);
         $stmt->execute();
@@ -101,9 +146,14 @@ class Grup extends classParent
         return $stmt->execute();
     }
 
+    public function deleteGrup($idgrup, $username_pembuat) {
+        $stmt = $this->mysqli->prepare("DELETE FROM grup WHERE idgrup = ? AND username_pembuat = ?");
+        $stmt->bind_param("is", $idgrup, $username_pembuat);
+        return $stmt->execute();
+    }
+    
     public function searchCandidateMhs($keyword, $idgrup) {
         $key = "%" . $keyword . "%";
-        // Logic: Cari mahasiswa yg BELUM ada di grup ini
         $sql = "SELECT m.nama, m.nrp, a.username 
                 FROM mahasiswa m 
                 JOIN akun a ON m.nrp = a.nrp_mahasiswa

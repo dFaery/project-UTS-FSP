@@ -12,7 +12,7 @@ class Event extends classParent
 
     public function addEvent($idgrup, $judul, $tanggal, $ket) {
         $slug = strtolower(str_replace(' ', '-', $judul)); // Simple slug
-        $jenis = 'Public';
+        $jenis = 'Publik';
         
         $stmt = $this->mysqli->prepare("INSERT INTO event (idgrup, judul, `judul-slug`, tanggal, keterangan, jenis) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("isssss", $idgrup, $judul, $slug, $tanggal, $ket, $jenis);
