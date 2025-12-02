@@ -10,9 +10,8 @@ class Mahasiswa extends classParent
     
     public function getMahasiswa($cari_mahasiswa, $nrp_to_edit = null, $offset = null, $limit = null)
     {
-
+        
         $cari_persen = "%" . $cari_mahasiswa . "%";
-
 
         if ($nrp_to_edit == null) {
             if (!is_null($offset)) {

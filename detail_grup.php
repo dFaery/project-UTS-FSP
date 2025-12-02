@@ -35,6 +35,31 @@ if ($canManageEvent && isset($_POST['btnTambahEvent'])) {
     header("Location: detail_grup.php?id=$idgrup");
 }
 
+$eventEdit = null; // Default kosong (Mode Tambah)
+if ($canManageEvent && isset($_GET['edit_event'])) {
+    $eventEdit = $eventObj->getEventById($_GET['edit_event']);
+}
+
+// --- LOGIC 1: SIMPAN BARU / UPDATE ---
+if ($canManageEvent && isset($_POST['btnSimpanEvent'])) {
+    if(!empty($_POST['idevent_edit'])) {
+        // Mode UPDATE
+        $eventObj->updateEvent($_POST['idevent_edit'], $_POST['judul'], $_POST['tanggal'], $_POST['keterangan']);
+        echo "<script>alert('Event berhasil diperbarui!'); window.location.href='detail_grup.php?id=$idgrup';</script>";
+    } else {
+        // Mode INSERT (TAMBAH)
+        $eventObj->addEvent($idgrup, $_POST['judul'], $_POST['tanggal'], $_POST['keterangan']);
+        // Redirect agar form bersih kembali
+        header("Location: detail_grup.php?id=$idgrup");
+    }
+}
+
+// --- LOGIC 2: HAPUS EVENT ---
+if ($canManageEvent && isset($_GET['hapus_event'])) {
+    $eventObj->deleteEvent($_GET['hapus_event']);
+    header("Location: detail_grup.php?id=$idgrup");
+}
+
 // --- LOGIC: KELUAR GRUP (Member Only - Dosen/Mhs) ---
 if (isset($_GET['action']) && $_GET['action'] == 'leave' && !$isPembuat) {
     $grupObj->removeMember($idgrup, $username);
@@ -109,27 +134,66 @@ if ($isPembuat && isset($_GET['kick_user'])) {
         <p>Pengampu: <b><?= $grup['username_pembuat'] ?></b> | <?= htmlspecialchars($grup['deskripsi']) ?></p>
     <?php endif; ?>
 
-    <div class="row">
-        <div class="col">
-            <h3>Agenda / Event</h3>
+    <div class="col">
+            <h3>📅 Agenda / Event</h3>
+            
             <?php if ($canManageEvent): ?>
-                <form method="POST">
-                    <input type="text" name="judul" placeholder="Judul Event" required>
-                    <input type="date" name="tanggal" required>
-                    <textarea name="keterangan" placeholder="Keterangan"></textarea>
-                    <button type="submit" name="btnTambahEvent" class="btn btn-save" style="width:100%;">Tambah Event</button>
-                </form>
-                <hr>
+                <div style="background: #fff; padding: 15px; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 5px;">
+                    <h4 style="margin-top:0;"><?= $eventEdit ? "✏️ Edit Event" : "➕ Tambah Event Baru" ?></h4>
+                    <form method="POST">
+                        <input type="hidden" name="idevent_edit" value="<?= $eventEdit ? $eventEdit['idevent'] : '' ?>">
+                        
+                        <input type="text" name="judul" placeholder="Judul Event" required 
+                               value="<?= $eventEdit ? htmlspecialchars($eventEdit['judul']) : '' ?>">
+                        
+                        <input type="date" name="tanggal" required 
+                               value="<?= $eventEdit ? date('Y-m-d', strtotime($eventEdit['tanggal'])) : '' ?>">
+                        
+                        <textarea name="keterangan" placeholder="Keterangan" rows="2"><?= $eventEdit ? htmlspecialchars($eventEdit['keterangan']) : '' ?></textarea>
+                        
+                        <div style="display:flex; gap:5px;">
+                            <?php if($eventEdit): ?>
+                                <a href="detail_grup.php?id=<?= $idgrup ?>" class="btn" style="background:#95a5a6; text-align:center;">Batal</a>
+                            <?php endif; ?>
+                            <button type="submit" name="btnSimpanEvent" class="btn btn-save" style="flex:1;">
+                                <?= $eventEdit ? "Simpan Perubahan" : "Tambahkan Event" ?>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             <?php endif; ?>
             
             <table>
-                <tr><th>Tanggal</th><th>Event</th></tr>
+                <thead>
+                    <tr>
+                        <th width="25%">Tanggal</th>
+                        <th>Event</th>
+                        <?php if($canManageEvent) echo "<th width='20%'>Aksi</th>"; ?>
+                    </tr>
+                </thead>
+                <tbody>
                 <?php
                 $resEvent = $eventObj->getEventsByGrup($idgrup);
                 if($resEvent->num_rows > 0){
-                    while($e = $resEvent->fetch_assoc()) echo "<tr><td>{$e['tanggal']}</td><td><b>{$e['judul']}</b><br><small>{$e['keterangan']}</small></td></tr>";
-                } else { echo "<tr><td colspan='2'>Kosong.</td></tr>"; }
+                    while($e = $resEvent->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td>".date('d M Y', strtotime($e['tanggal']))."</td>";
+                        echo "<td><b>".htmlspecialchars($e['judul'])."</b><br><small>".htmlspecialchars($e['keterangan'])."</small></td>";
+                        
+                        // Tombol Aksi (Hanya muncul jika berhak)
+                        if($canManageEvent){
+                            echo "<td>
+                                <a href='detail_grup.php?id=$idgrup&edit_event={$e['idevent']}' class='btn btn-kelola' style='padding:5px; font-size:12px;'>✏️</a>
+                                <a href='detail_grup.php?id=$idgrup&hapus_event={$e['idevent']}' class='btn btn-kick' style='padding:5px; font-size:12px;' onclick='return confirm(\"Hapus event ini?\")'>🗑️</a>
+                            </td>";
+                        }
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='3' style='text-align:center; color:gray;'>Belum ada agenda.</td></tr>";
+                }
                 ?>
+                </tbody>
             </table>
         </div>
 
