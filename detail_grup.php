@@ -146,8 +146,8 @@ if ($isPembuat && isset($_GET['kick_user'])) {
                         <input type="text" name="judul" placeholder="Judul Event" required 
                                value="<?= $eventEdit ? htmlspecialchars($eventEdit['judul']) : '' ?>">
                         
-                        <input type="date" name="tanggal" required 
-                               value="<?= $eventEdit ? date('Y-m-d', strtotime($eventEdit['tanggal'])) : '' ?>">
+                        <input type="datetime-local" name="tanggal" required 
+                               value="<?= $eventEdit ? date('Y-m-d\TH:i', strtotime($eventEdit['tanggal'])) : '' ?>">
                         
                         <textarea name="keterangan" placeholder="Keterangan" rows="2"><?= $eventEdit ? htmlspecialchars($eventEdit['keterangan']) : '' ?></textarea>
                         
