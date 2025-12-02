@@ -61,9 +61,16 @@ if ($canManageEvent && isset($_GET['hapus_event'])) {
 }
 
 // --- LOGIC: KELUAR GRUP (Member Only - Dosen/Mhs) ---
-if (isset($_GET['action']) && $_GET['action'] == 'leave' && !$isPembuat) {
-    $grupObj->removeMember($idgrup, $username);
-    echo "<script>alert('Anda keluar dari grup.'); window.location.href='index.php';</script>";
+if ($isPembuat && isset($_GET['kick_user'])) {
+    $status = $grupObj->removeMember($idgrup, $_GET['kick_user']);
+    
+    if ($status == "SUCCESS") {
+        echo "<script>alert('Member berhasil dikeluarkan.'); window.location.href='detail_grup.php?id=$idgrup';</script>";
+    } else if ($status == "OWNER") {
+        echo "<script>alert('GAGAL: Anda tidak bisa mengeluarkan diri sendiri (Pemilik Grup).'); window.location.href='detail_grup.php?id=$idgrup';</script>";
+    } else {
+        echo "<script>alert('Gagal menghapus member.'); window.location.href='detail_grup.php?id=$idgrup';</script>";
+    }
 }
 
 // --- LOGIC: KICK MEMBER (Owner Only) ---
@@ -93,6 +100,57 @@ if ($isPembuat && isset($_GET['kick_user'])) {
         th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
         th { background: #3498db; color: white; }
         .edit-box { background: #fff8e1; padding: 15px; border: 1px solid #ffe082; border-radius: 5px; margin-bottom: 20px; }
+        /* Style khusus untuk Search Box Mahasiswa */
+        .search-container {
+            position: relative; /* Agar hasil search nempel di bawah input */
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #b3e5fc;
+        }
+
+        #keyword {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box; /* Agar padding tidak merusak lebar */
+        }
+
+        /* Style untuk Kotak Hasil Pencarian (Dropdown) */
+        #search-result {
+            display: none; /* Sembunyi default */
+            position: absolute; /* Mengambang di atas konten lain */
+            z-index: 1000;
+            width: calc(100% - 30px); /* Lebar menyesuaikan container dikurangi padding */
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 0 0 5px 5px;
+        }
+
+        /* Style untuk setiap baris hasil pencarian */
+        .search-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        .search-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
     </style>
     <script src="jquery-3.7.1.js"></script>
 </head>
@@ -108,7 +166,7 @@ if ($isPembuat && isset($_GET['kick_user'])) {
 
     <?php if ($isPembuat): ?>
         <div class="edit-box">
-            <h3>✏️ Pengaturan Grup</h3>
+            <h3>Pengaturan Grup</h3>
             <form method="POST" style="display:flex; gap:10px; align-items:flex-end;">
                 <div style="flex:2">
                     <label>Nama Grup</label>
@@ -135,18 +193,18 @@ if ($isPembuat && isset($_GET['kick_user'])) {
     <?php endif; ?>
 
     <div class="col">
-            <h3>📅 Agenda / Event</h3>
+            <h3>Agenda / Event</h3>
             
             <?php if ($canManageEvent): ?>
                 <div style="background: #fff; padding: 15px; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 5px;">
-                    <h4 style="margin-top:0;"><?= $eventEdit ? "✏️ Edit Event" : "➕ Tambah Event Baru" ?></h4>
+                    <h4 style="margin-top:0;"><?= $eventEdit ? "Edit Event" : "Tambah Event Baru" ?></h4>
                     <form method="POST">
                         <input type="hidden" name="idevent_edit" value="<?= $eventEdit ? $eventEdit['idevent'] : '' ?>">
                         
                         <input type="text" name="judul" placeholder="Judul Event" required 
                                value="<?= $eventEdit ? htmlspecialchars($eventEdit['judul']) : '' ?>">
                         
-                        <input type="datetime-local" name="tanggal" required 
+                        <input type="datetime-local" name="tanggal" required
                                value="<?= $eventEdit ? date('Y-m-d\TH:i', strtotime($eventEdit['tanggal'])) : '' ?>">
                         
                         <textarea name="keterangan" placeholder="Keterangan" rows="2"><?= $eventEdit ? htmlspecialchars($eventEdit['keterangan']) : '' ?></textarea>
@@ -177,14 +235,13 @@ if ($isPembuat && isset($_GET['kick_user'])) {
                 if($resEvent->num_rows > 0){
                     while($e = $resEvent->fetch_assoc()) {
                         echo "<tr>";
-                        echo "<td>".date('d M Y', strtotime($e['tanggal']))."</td>";
+                        echo "<td>".date('Y-m-d H:i', strtotime($e['tanggal']))."</td>";
                         echo "<td><b>".htmlspecialchars($e['judul'])."</b><br><small>".htmlspecialchars($e['keterangan'])."</small></td>";
-                        
-                        // Tombol Aksi (Hanya muncul jika berhak)
+
                         if($canManageEvent){
                             echo "<td>
-                                <a href='detail_grup.php?id=$idgrup&edit_event={$e['idevent']}' class='btn btn-kelola' style='padding:5px; font-size:12px;'>✏️</a>
-                                <a href='detail_grup.php?id=$idgrup&hapus_event={$e['idevent']}' class='btn btn-kick' style='padding:5px; font-size:12px;' onclick='return confirm(\"Hapus event ini?\")'>🗑️</a>
+                                <a href='detail_grup.php?id=$idgrup&edit_event={$e['idevent']}' class='btn btn-kelola' style='padding:5px; font-size:12px; background:#f39c12;'>Edit</a>
+                                <a href='detail_grup.php?id=$idgrup&hapus_event={$e['idevent']}' class='btn btn-kick' style='padding:5px; font-size:12px;' onclick='return confirm(\"Hapus event ini?\")'>Delete</a>
                             </td>";
                         }
                         echo "</tr>";
@@ -198,24 +255,26 @@ if ($isPembuat && isset($_GET['kick_user'])) {
         </div>
 
         <div class="col">
-            <h3>👥 Anggota Grup</h3>
+            <h3>Anggota Grup</h3>
             
             <?php if ($isPembuat): ?>
-                <div style="background:#e8f4fd; padding:10px; margin-bottom:10px;">
-                    <b>Tambah Mahasiswa:</b>
-                    <input type="text" id="keyword" placeholder="Cari Nama/NRP..." style="margin-top:5px;">
-                    <div id="search-result" style="background:white; max-height:150px; overflow-y:auto; display:none;"></div>
+                <div class="search-container">
+                    <label style="display:block; margin-bottom:5px; font-weight:bold; color:#2c3e50;">
+                        Tambah Mahasiswa
+                    </label>
+                    
+                    <input type="text" id="keyword" placeholder="Ketik Nama atau NRP mahasiswa...">
+                    
+                    <div id="search-result"></div>
                 </div>
             <?php endif; ?>
 
             <table>
                 <tr><th>NRP</th><th>Nama</th><?php if($isPembuat) echo "<th>Aksi</th>"; ?></tr>
                 <?php
-                // Menggunakan fungsi baru getMembers yang sudah disesuaikan query-nya
                 $resM = $grupObj->getMembers($idgrup);
                 if($resM->num_rows > 0){
                     while($m = $resM->fetch_assoc()){
-                        // Visualisasi beda role
                         $roleBadge = ($m['role'] == 'Dosen') ? " <span style='background:gold; padding:2px; font-size:10px;'>Dosen</span>" : "";
                         
                         echo "<tr>
@@ -223,7 +282,7 @@ if ($isPembuat && isset($_GET['kick_user'])) {
                             <td>{$m['nama_lengkap']}$roleBadge</td>";
                             
                             if($isPembuat){
-                                echo "<td><a href='?id=$idgrup&kick_user={$m['username']}' class='btn btn-kick' onclick='return confirm(\"Keluarkan?\")'>Kick</a></td>";
+                                echo "<td><a href='?id=$idgrup&kick_user={$m['username']}' class='btn btn-kick' onclick='return confirm(\"Keluarkan?\")'>Keluarkan</a></td>";
                             }
                         echo "</tr>";
                     }
@@ -236,25 +295,50 @@ if ($isPembuat && isset($_GET['kick_user'])) {
 
 <script>
 $(document).ready(function(){
+    
+    // --- 1. LOGIC PENCARIAN (LIVE SEARCH) ---
     $('#keyword').keyup(function(){
         let key = $(this).val();
-        let idgrup = <?= $idgrup ?>;
+        let idgrup = <?= $idgrup ?>; // Mengambil ID Grup dari variabel PHP
+        
+        // Hanya mencari jika user mengetik lebih dari 2 huruf
         if(key.length > 2){
             $.ajax({
-                url: 'ajax_search_mhs.php',
+                url: 'ajax_search.php', // File perantara yang akan kita buat/cek
                 method: 'POST',
                 data: {keyword: key, idgrup: idgrup},
-                success: function(data){ $('#search-result').html(data).show(); }
+                success: function(data){
+                    // Tampilkan hasil pencarian di div #search-result
+                    $('#search-result').html(data).show();
+                }
             });
-        } else { $('#search-result').hide(); }
+        } else {
+            // Sembunyikan jika input kosong/pendek
+            $('#search-result').hide();
+        }
     });
+
+    // --- 2. LOGIC KLIK TOMBOL TAMBAH (+) ---
+    // Kita pakai $(document).on('click'...) karena tombolnya muncul dinamis via AJAX
     $(document).on('click', '.add-btn-ajax', function(){
-        let user = $(this).data('user');
+        let username_mhs = $(this).data('user'); // Ambil data dari atribut data-user
         let idgrup = <?= $idgrup ?>;
-        $.post('ajax_add_member.php', {username: user, idgrup: idgrup}, function(res){
-            if(res.trim() == 'ok'){ alert('Berhasil ditambahkan!'); location.reload(); } 
+        let tombol = $(this);
+
+        // Ubah teks tombol jadi loading...
+        tombol.text('...').prop('disabled', true);
+
+        $.post('ajax_add_member.php', {username: username_mhs, idgrup: idgrup}, function(response){
+            if(response.trim() == 'ok'){
+                alert('Berhasil menambahkan mahasiswa!');
+                location.reload(); // Reload halaman agar tabel member terupdate
+            } else {
+                alert('Gagal menambahkan member.');
+                tombol.text('+').prop('disabled', false);
+            }
         });
     });
+
 });
 </script>
 </body>

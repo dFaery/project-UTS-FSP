@@ -140,10 +140,20 @@ class Grup extends classParent
         return $stmt->execute();
     }
 
-    public function removeMember($idgrup, $username) {
+    public function removeMember($idgrup, $username_target) {
+        $grupData = $this->getGrupById($idgrup);
+        
+        if ($grupData['username_pembuat'] == $username_target) {
+            return "OWNER"; 
+        }
+
         $stmt = $this->mysqli->prepare("DELETE FROM member_grup WHERE idgrup = ? AND username = ?");
-        $stmt->bind_param("is", $idgrup, $username);
-        return $stmt->execute();
+        $stmt->bind_param("is", $idgrup, $username_target);
+        
+        if($stmt->execute()){
+            return "SUCCESS";
+        }
+        return "FAIL";
     }
 
     public function deleteGrup($idgrup, $username_pembuat) {

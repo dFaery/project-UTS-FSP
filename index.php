@@ -72,7 +72,7 @@ if (isset($_POST['btnJoin'])) {
             
             <div class="flex-row">
                 <div class="flex-col form-box">
-                    <h3>+ Buat Grup Baru</h3>
+                    <h3>Buat Grup Baru</h3>
                     <form method="POST">
                         <div class="form-group"><input type="text" name="nama_grup" required placeholder="Nama Mata Kuliah"></div>
                         <div class="form-group">
@@ -125,12 +125,50 @@ if (isset($_POST['btnJoin'])) {
                 </tbody>
             </table>
 
+            </table> <hr style="border:0; border-top:1px dashed #ccc; margin:30px 0;">
+
+            <h3>Grup yang Saya Ikuti (Tim Dosen)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="5%">No</th>
+                        <th width="25%">Nama Grup</th>
+                        <th width="20%">Dosen Pemilik</th>
+                        <th width="35%">Deskripsi</th>
+                        <th width="15%" style="text-align: center;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $resJoined = $grupObj->getJoinedGroups($username);
+
+                    if ($resJoined->num_rows > 0) {
+                        $no = 1;
+                        while ($row = $resJoined->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td>" . $no++ . "</td>";
+                            echo "<td><b>" . htmlspecialchars($row['nama']) . "</b></td>";
+                            echo "<td>" . htmlspecialchars($row['username_pembuat']) . "</td>"; 
+                            echo "<td>" . htmlspecialchars($row['deskripsi']) . "</td>";
+                            
+                            echo "<td style='text-align: center;'>";
+                            echo "<a href='detail_grup.php?id=" . $row['idgrup'] . "' class='btn btn-save' style='padding:5px 10px; width:auto; background: #f39c12;'>Lihat</a>";
+                            echo "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='5' style='text-align:center; color:gray;'>Anda belum bergabung dengan grup dosen lain.</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+
             <h3>Grup Publik (Dosen Lain)</h3>
             <table>
                 <thead><tr><th width="5%">No</th><th width="25%">Nama Grup</th><th width="20%">Dosen</th><th width="30%">Deskripsi</th><th width="20%">Aksi</th></tr></thead>
                 <tbody>
                     <?php
-                    $resPub = $grupObj->getAvailablePublicGroups($username); // Method Baru
+                    $resPub = $grupObj->getAvailablePublicGroups($username); 
                     if ($resPub->num_rows > 0) {
                         $no = 1;
                         while ($r = $resPub->fetch_assoc()) {
@@ -142,7 +180,7 @@ if (isset($_POST['btnJoin'])) {
                                 <td>
                                     <form method='POST' style='display:inline;'>
                                         <input type='hidden' name='kode_join' value='".$r['kode_pendaftaran']."'>
-                                        <button type='submit' name='btnJoin' class='btn btn-save' style='padding:5px 10px; width:auto;'>+ Gabung</button>
+                                        <button type='submit' name='btnJoin' class='btn btn-save' style='padding:5px 10px; width:auto;'>Gabung</button>
                                     </form>
                                 </td>
                             </tr>";
@@ -194,7 +232,7 @@ if (isset($_POST['btnJoin'])) {
                 <thead><tr><th width="5%">No</th><th width="25%">Nama Grup</th><th width="20%">Dosen</th><th width="35%">Deskripsi</th><th width="15%">Aksi</th></tr></thead>
                 <tbody>
                     <?php
-                    $resPub = $grupObj->getAvailablePublicGroups($username); // Method Baru
+                    $resPub = $grupObj->getAvailablePublicGroups($username); 
                     if ($resPub->num_rows > 0) {
                         $no = 1;
                         while ($r = $resPub->fetch_assoc()) {
@@ -206,7 +244,7 @@ if (isset($_POST['btnJoin'])) {
                                 <td>
                                     <form method='POST' style='display:inline;'>
                                         <input type='hidden' name='kode_join' value='".$r['kode_pendaftaran']."'>
-                                        <button type='submit' name='btnJoin' class='btn btn-save' style='padding:5px 10px; width:auto;'>+ Gabung</button>
+                                        <button type='submit' name='btnJoin' class='btn btn-save' style='padding:5px 10px; width:auto;'>Gabung</button>
                                     </form>
                                 </td>
                             </tr>";
