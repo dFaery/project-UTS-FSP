@@ -193,17 +193,6 @@ if (isset($_POST['btnJoin'])) {
         <?php else: ?>
             
             <h1>Dashboard Mahasiswa</h1>
-            
-            <div class="form-box">
-                <h3>Gabung ke Grup via Kode</h3>
-                <form method="POST">
-                    <div style="display:flex; gap:10px;">
-                        <input type="text" name="kode_join" placeholder="Kode Pendaftaran" required>
-                        <button type="submit" name="btnJoin" class="btn btn-save" style="width:auto;">Join</button>
-                    </div>
-                    <small style="color:red;">* Grup Privat hanya bisa dimasukkan manual oleh Dosen.</small>
-                </form>
-            </div>
 
             <h3>Grup yang Saya Ikuti</h3>
             <table>
@@ -232,29 +221,74 @@ if (isset($_POST['btnJoin'])) {
                 <thead><tr><th width="5%">No</th><th width="25%">Nama Grup</th><th width="20%">Dosen</th><th width="35%">Deskripsi</th><th width="15%">Aksi</th></tr></thead>
                 <tbody>
                     <?php
-                    $resPub = $grupObj->getAvailablePublicGroups($username); 
+                    $resPub = $grupObj->getAvailablePublicGroups($username);
                     if ($resPub->num_rows > 0) {
                         $no = 1;
                         while ($r = $resPub->fetch_assoc()) {
                             echo "<tr>
                                 <td>".$no++."</td>
                                 <td><b>".htmlspecialchars($r['nama'])."</b></td>
-                                <td>".htmlspecialchars($r['username_pembuat'])."</td>
+                                <td>".htmlspecialchars($r['nama_dosen'])."</td>
                                 <td>".htmlspecialchars($r['deskripsi'])."</td>
                                 <td>
-                                    <form method='POST' style='display:inline;'>
-                                        <input type='hidden' name='kode_join' value='".$r['kode_pendaftaran']."'>
-                                        <button type='submit' name='btnJoin' class='btn btn-save' style='padding:5px 10px; width:auto;'>Gabung</button>
-                                    </form>
+                                    <button type='button' class='btn btn-save' 
+                                            style='padding:5px 10px; width:auto; font-size:12px;'
+                                            onclick='openJoinModal(\"".htmlspecialchars($r['nama'])."\", \"".htmlspecialchars($r['nama_dosen'])."\")'>
+                                        Gabung
+                                    </button>
                                 </td>
                             </tr>";
                         }
-                    } else { echo "<tr><td colspan='5'>Tidak ada grup publik baru yang tersedia.</td></tr>"; }
+                    } else { echo "<tr><td colspan='5' style='text-align:center;'>Tidak ada grup publik baru.</td></tr>"; }
                     ?>
                 </tbody>
             </table>
 
         <?php endif; ?>
     </div>
+
+    <div id="modalJoin" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
+        <div style="background:white; width:400px; margin:100px auto; padding:20px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.2); position:relative;">
+            
+            <h3 style="margin-top:0;">Masukkan Kode Grup</h3>
+            <p>Anda akan bergabung ke grup: <br><b id="modalGrupName" style="color:#2c3e50;">-</b></p>
+            <p><small>Dosen: <span id="modalDosenName">-</span></small></p>
+            
+            <form method="POST">
+                <div class="form-group">
+                    <input type="text" name="kode_join" id="inputKode" placeholder="Ketik Kode Pendaftaran..." required autocomplete="off" style="font-size:16px; text-transform:uppercase; text-align:center; letter-spacing:2px;">
+                </div>
+                
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button type="button" onclick="closeJoinModal()" class="btn" style="background:#95a5a6; flex:1;">Batal</button>
+                    <button type="submit" name="btnJoin" class="btn btn-save" style="flex:1;">Gabung Sekarang</button>
+                </div>
+            </form>
+
+            <button onclick="closeJoinModal()" style="position:absolute; top:10px; right:10px; border:none; background:none; font-size:18px; cursor:pointer;">&times;</button>
+        </div>
+    </div>
+
+    <script>
+        function openJoinModal(namaGrup, namaDosen) {
+            document.getElementById('modalGrupName').innerText = namaGrup;
+            document.getElementById('modalDosenName').innerText = namaDosen;
+            document.getElementById('inputKode').value = '';
+            document.getElementById('modalJoin').style.display = 'block';
+            document.getElementById('inputKode').focus();
+        }
+
+        function closeJoinModal() {
+            document.getElementById('modalJoin').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            let modal = document.getElementById('modalJoin');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+
 </body>
 </html>
