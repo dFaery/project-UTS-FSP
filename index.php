@@ -7,19 +7,17 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) { header("Locati
 
 $username = $_SESSION['user'];
 $grupObj = new Grup();
-$isDosen = $grupObj->isDosen($username); // Saya asumsi method ini ada di class Grup
+$isDosen = $grupObj->isDosen($username); 
 $pesan = "";
 
-// LOGIC 1: BUAT GRUP & HAPUS GRUP (Dosen Only)
 if ($isDosen && isset($_POST['btnSimpanGrup'])) {
     $kode_baru = $grupObj->createGrup($username, $_POST['nama_grup'], $_POST['deskripsi'], $_POST['jenis']);
     if ($kode_baru) $pesan = "<script>alert('Grup Dibuat! Kode: $kode_baru'); window.location.href='index.php';</script>";
 }
 if ($isDosen && isset($_GET['hapus_grup'])) {
     if($grupObj->deleteGrup($_GET['hapus_grup'], $username)) $pesan = "<script>alert('Grup dihapus!'); window.location.href='index.php';</script>";
-}
+}  
 
-// LOGIC 2: JOIN GRUP
 if (isset($_POST['btnJoin'])) {
     $status = $grupObj->joinGrup($username, $_POST['kode_join']);
     

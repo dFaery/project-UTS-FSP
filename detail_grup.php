@@ -100,9 +100,10 @@ if ($isPembuat && isset($_GET['kick_user'])) {
         th, td { padding: 8px; border-bottom: 1px solid #ddd; text-align: left; }
         th { background: #3498db; color: white; }
         .edit-box { background: #fff8e1; padding: 15px; border: 1px solid #ffe082; border-radius: 5px; margin-bottom: 20px; }
+
         /* Style khusus untuk Search Box Mahasiswa */
         .search-container {
-            position: relative; /* Agar hasil search nempel di bawah input */
+            position: relative; 
             background: #e8f4fd;
             padding: 15px;
             border-radius: 8px;
@@ -134,7 +135,6 @@ if ($isPembuat && isset($_GET['kick_user'])) {
             border-radius: 0 0 5px 5px;
         }
 
-        /* Style untuk setiap baris hasil pencarian */
         .search-item {
             padding: 10px;
             border-bottom: 1px solid #eee;
@@ -338,7 +338,6 @@ $(document).ready(function(){
             }
         });
     });
-
 });
 </script>
 </body>
