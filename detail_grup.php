@@ -3,7 +3,10 @@ session_start();
 require_once("class/Grup.php");
 require_once("class/Event.php");
 
+// 1. Cek Login
 if (!isset($_SESSION['user'])) { header("Location: login.php"); exit(); }
+
+// 2. Cek Parameter ID
 if (!isset($_GET['id'])) { die("ID Grup tidak ditemukan."); }
 
 $idgrup = $_GET['id'];
@@ -12,13 +15,22 @@ $username = $_SESSION['user'];
 $grupObj = new Grup();
 $eventObj = new Event();
 
+// 3. Ambil Data Grup
 $grup = $grupObj->getGrupById($idgrup);
 if(!$grup) die("Grup tidak ditemukan.");
 
-// --- PERMISSION CHECK ---
+// --- PERMISSION VARIABLES ---
 $isPembuat = ($grup['username_pembuat'] == $username);
+$isMember = $grupObj->isMember($idgrup, $username);
 $isDosen = $grupObj->isDosen($username);
-$isMember = $grupObj->isMember($idgrup, $username); // Cek apakah dia member (bukan owner)
+
+// --- SECURITY CHECK (BARU) ---
+// Jika bukan pembuat DAN bukan member aktif, tolak akses.
+// Ini otomatis menangani kasus mahasiswa yang sudah di-kick.
+if (!$isPembuat && !$isMember) {
+    echo "<script>alert('Akses Ditolak: Anda bukan anggota grup ini atau telah dikeluarkan.'); window.location.href='index.php';</script>";
+    exit();
+}
 
 // Hak Akses Mengelola Event: Pembuat ATAU (Member DAN Dosen)
 $canManageEvent = ($isPembuat || ($isMember && $isDosen));
@@ -29,54 +41,47 @@ if ($isPembuat && isset($_POST['btnUpdateGrup'])) {
     echo "<script>alert('Info grup diperbarui!'); window.location.href='detail_grup.php?id=$idgrup';</script>";
 }
 
-// --- LOGIC: TAMBAH EVENT (Owner & Dosen Member) ---
-if ($canManageEvent && isset($_POST['btnTambahEvent'])) {
-    $eventObj->addEvent($idgrup, $_POST['judul'], $_POST['tanggal'], $_POST['keterangan']);
-    header("Location: detail_grup.php?id=$idgrup");
-}
-
-$eventEdit = null; // Default kosong (Mode Tambah)
+// --- LOGIC: TAMBAH / EDIT / HAPUS EVENT ---
+// Variabel Event Edit
+$eventEdit = null;
 if ($canManageEvent && isset($_GET['edit_event'])) {
     $eventEdit = $eventObj->getEventById($_GET['edit_event']);
 }
 
-// --- LOGIC 1: SIMPAN BARU / UPDATE ---
+// Simpan/Update Event
 if ($canManageEvent && isset($_POST['btnSimpanEvent'])) {
     if(!empty($_POST['idevent_edit'])) {
-        // Mode UPDATE
         $eventObj->updateEvent($_POST['idevent_edit'], $_POST['judul'], $_POST['tanggal'], $_POST['keterangan']);
         echo "<script>alert('Event berhasil diperbarui!'); window.location.href='detail_grup.php?id=$idgrup';</script>";
     } else {
-        // Mode INSERT (TAMBAH)
         $eventObj->addEvent($idgrup, $_POST['judul'], $_POST['tanggal'], $_POST['keterangan']);
-        // Redirect agar form bersih kembali
         header("Location: detail_grup.php?id=$idgrup");
     }
 }
 
-// --- LOGIC 2: HAPUS EVENT ---
+// Hapus Event
 if ($canManageEvent && isset($_GET['hapus_event'])) {
     $eventObj->deleteEvent($_GET['hapus_event']);
     header("Location: detail_grup.php?id=$idgrup");
 }
 
-// --- LOGIC: KELUAR GRUP (Member Only - Dosen/Mhs) ---
+// --- LOGIC: KELUAR GRUP (Member Only) ---
+if (isset($_GET['action']) && $_GET['action'] == 'leave' && !$isPembuat) {
+    $grupObj->removeMember($idgrup, $username);
+    echo "<script>alert('Anda keluar dari grup.'); window.location.href='index.php';</script>";
+}
+
+// --- LOGIC: KICK MEMBER (Owner Only) ---
 if ($isPembuat && isset($_GET['kick_user'])) {
     $status = $grupObj->removeMember($idgrup, $_GET['kick_user']);
     
     if ($status == "SUCCESS") {
         echo "<script>alert('Member berhasil dikeluarkan.'); window.location.href='detail_grup.php?id=$idgrup';</script>";
-    } else if ($status == "OWNER") {
+    } else if ($status == "CANNOT_KICK_OWNER") {
         echo "<script>alert('GAGAL: Anda tidak bisa mengeluarkan diri sendiri (Pemilik Grup).'); window.location.href='detail_grup.php?id=$idgrup';</script>";
     } else {
         echo "<script>alert('Gagal menghapus member.'); window.location.href='detail_grup.php?id=$idgrup';</script>";
     }
-}
-
-// --- LOGIC: KICK MEMBER (Owner Only) ---
-if ($isPembuat && isset($_GET['kick_user'])) {
-    $grupObj->removeMember($idgrup, $_GET['kick_user']);
-    header("Location: detail_grup.php?id=$idgrup");
 }
 ?>
 
@@ -160,7 +165,7 @@ if ($isPembuat && isset($_GET['kick_user'])) {
     <div style="margin-bottom:15px; overflow:hidden;">
         <a href="index.php" class="btn btn-back">Kembali</a>
         <?php if(!$isPembuat): ?>
-            <a href="?id=<?= $idgrup ?>&action=leave" class="btn btn-leave" onclick="return confirm('Keluar grup?')">🚪 Keluar Grup</a>
+            <a href="?id=<?= $idgrup ?>&action=leave" class="btn btn-leave" onclick="return confirm('Keluar grup?')">Keluar Grup</a>
         <?php endif; ?>
     </div>
 
