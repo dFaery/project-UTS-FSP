@@ -12,14 +12,14 @@ else{
 }
 
 require_once("../class/mahasiswa.php");
-$mahasiswa = new Mahasiswa();
+$mahasiswaObj = new Mahasiswa(); // Rename variable to avoid conflict with array variable below
 
 if (!isset($_GET['nrp'])) {
     die("NRP tidak ditemukan.");
 }
 $nrp_to_edit = $_GET['nrp'];
 
-$result = $mahasiswa->getMahasiswa($nrp_to_edit);
+$result = $mahasiswaObj->getMahasiswa($nrp_to_edit);
 
 if ($result->num_rows === 0) {
     die("Data mahasiswa tidak ditemukan.");
@@ -31,22 +31,119 @@ $mahasiswa = $result->fetch_assoc();
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Mahasiswa</title>
     <style>
-        body { font-family: sans-serif; background-color: #f0f2f5; padding: 20px; }
-        .container { max-width: 500px; margin: auto; background-color: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #2c3e50; }
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-container: #fff;
+            --text-main: #2c3e50;
+            --text-label: #000;
+            --input-bg: #fff;
+            --input-text: #000;
+            --border-color: #ccc;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        /* Dark Mode Override */
+        body.dark-mode {
+            --bg-body: #18191a;
+            --bg-container: #242526;
+            --text-main: #e4e6eb;
+            --text-label: #b0b3b8;
+            --input-bg: #3a3b3c;
+            --input-text: #e4e6eb;
+            --border-color: #555;
+            --shadow: rgba(255,255,255,0.1);
+        }
+
+        body { 
+            font-family: sans-serif; 
+            background-color: var(--bg-body); 
+            padding: 20px; 
+            transition: background 0.3s;
+            color: var(--text-label);
+        }
+
+        .container { 
+            max-width: 500px; 
+            margin: auto; 
+            background-color: var(--bg-container); 
+            padding: 30px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 15px var(--shadow); 
+        }
+
+        h1 { 
+            text-align: center; 
+            color: var(--text-main); 
+        }
+
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .current-photo { max-width: 100px; border-radius: 5px; margin-top: 10px; }
+        
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: bold; 
+            color: var(--text-label);
+        }
+
+        input, select { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 5px; 
+            box-sizing: border-box; 
+            background-color: var(--input-bg);
+            color: var(--input-text);
+        }
+
+        .current-photo { 
+            max-width: 100px; 
+            border-radius: 5px; 
+            margin-top: 10px; 
+            border: 2px solid var(--border-color);
+        }
+
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        .btn { padding: 10px 15px; border: none; border-radius: 5px; text-decoration: none; color: white; cursor: pointer; text-align: center; }
+        
+        .btn { 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 5px; 
+            text-decoration: none; 
+            color: white; 
+            cursor: pointer; 
+            text-align: center; 
+        }
+
         .btn-save { background-color: #f39c12; flex-grow: 1; }
         .btn-back { background-color: #7f8c8d; }
+
+        /* Toggle Button */
+        .theme-toggle-btn {
+            position: fixed; bottom: 20px; right: 20px;
+            width: 50px; height: 50px; border-radius: 50%;
+            background-color: var(--text-main); color: var(--bg-container);
+            border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 24px; display: flex; align-items: center; justify-content: center;
+            z-index: 1000; transition: transform 0.2s;
+        }
+        .theme-toggle-btn:hover { transform: scale(1.1); }
     </style>
+    <script>
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
 </head>
 <body>
+    <button class="theme-toggle-btn" id="themeToggle" title="Ganti Tema">🌓</button>
+
     <div class="container">
         <h1>Form Edit Mahasiswa</h1>
         <form action="../process/proses_edit_mahasiswa.php" method="POST" enctype="multipart/form-data">
@@ -64,7 +161,7 @@ $mahasiswa = $result->fetch_assoc();
                 <label for="gender">Gender</label>
                 <select id="gender" name="gender" required>
                     <option value="Pria" <?php if ($mahasiswa['gender'] == 'Pria') echo 'selected'; ?>>Pria</option>
-                    <option value="Pria" <?php if ($mahasiswa['gender'] == 'Wanita') echo 'selected'; ?>>Wanita</option>
+                    <option value="Wanita" <?php if ($mahasiswa['gender'] == 'Wanita') echo 'selected'; ?>>Wanita</option>
                 </select>
             </div>
             <div class="form-group">
@@ -78,9 +175,9 @@ $mahasiswa = $result->fetch_assoc();
             <div class="form-group">
                 <label for="foto">Ganti Foto (Kosongkan jika tidak ingin ganti)</label>                
                 <?php
-                if (!empty($mahasiswa['foto_extension'])) {
-                    $foto_path = "../images/" . $mahasiswa['nrp'] . "." . $mahasiswa['foto_extension'];                    
-                    echo "<img src='" . $foto_path . "' alt='Foto saat ini' class='current-photo'>";                                        
+                if (!empty($mahasiswa['foto_extention'])) {
+                    $foto_path = "../images/" . $mahasiswa['nrp'] . "." . $mahasiswa['foto_extention'];                    
+                    echo "<img src='" . $foto_path . "' alt='Foto saat ini' class='current-photo'>";                                
                 }
                 ?>
                 <input type="file" id="foto" name="foto" accept="image/jpeg, image/png">
@@ -91,5 +188,40 @@ $mahasiswa = $result->fetch_assoc();
             </div>
         </form>
     </div>
+
+    <script>
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const body = document.body;
+        const html = document.documentElement;
+
+        if (html.classList.contains('dark-mode')) {
+            body.classList.add('dark-mode');
+            html.classList.remove('dark-mode');
+            themeToggleBtn.textContent = '☀️';
+        } else {
+            themeToggleBtn.textContent = '🌙';
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                setCookie('theme', 'dark', 365);
+                themeToggleBtn.textContent = '☀️';
+            } else {
+                setCookie('theme', 'light', 365);
+                themeToggleBtn.textContent = '🌙';
+            }
+        });
+
+        function setCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+    </script>
 </body>
 </html>

@@ -99,40 +99,82 @@ if (isset($_POST['btnTambahThread'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail: <?= htmlspecialchars($grup['nama']) ?></title>
     <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-container: #fff;
+            --text-main: #2c3e50;
+            --text-secondary: #333;
+            --col-bg: #f9f9f9;
+            --col-border: #eee;
+            --input-bg: #fff;
+            --input-text: #000;
+            --table-border: #ddd;
+            --table-head-text: #fff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --modal-bg: #fff;
+            --yellow-box: #fff8e1;
+            --yellow-border: #ffe082;
+        }
+
+        body.dark-mode {
+            --bg-body: #18191a;
+            --bg-container: #242526;
+            --text-main: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --col-bg: #3a3b3c;
+            --col-border: #555;
+            --input-bg: #4e4f50;
+            --input-text: #e4e6eb;
+            --table-border: #555;
+            --table-head-text: #e4e6eb;
+            --shadow: rgba(255, 255, 255, 0.1);
+            --modal-bg: #242526;
+            --yellow-box: #4a4218;
+            --yellow-border: #665c26;
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
             font-family: sans-serif;
-            background: #f0f2f5;
+            background: var(--bg-body);
+            color: var(--text-secondary);
             padding: 20px;
             margin: 0;
+            transition: background 0.3s, color 0.3s;
         }
 
         .container {
             max-width: 1100px;
             margin: auto;
-            background: white;
+            background: var(--bg-container);
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: background 0.3s;
         }
 
-        /* --- LAYOUT UTAMA: VERTIKAL STACK (ATAS-BAWAH) --- */
+        h1, h3, h4, p {
+            color: var(--text-main);
+        }
+
+        /* --- LAYOUT UTAMA: VERTIKAL STACK --- */
         .row {
             display: flex;
-            flex-direction: column; /* Mengunci layout menjadi atas-bawah selamanya */
+            flex-direction: column;
             gap: 20px;
             margin-top: 20px;
         }
 
         .col {
-            width: 100%; /* Memastikan kolom mengambil lebar penuh */
+            width: 100%;
             padding: 15px;
-            background: #f9f9f9;
+            background: var(--col-bg);
             border-radius: 8px;
-            border: 1px solid #eee;
+            border: 1px solid var(--col-border);
         }
 
         /* BUTTONS */
@@ -158,40 +200,42 @@ if (isset($_POST['btnTambahThread'])) {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--table-border);
             border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
         }
 
-        /* TABLES - RESPONSIVE SCROLL */
+        /* TABLES */
         .table-responsive {
             width: 100%;
-            overflow-x: auto; /* Scroll horizontal jika tabel kepanjangan di HP */
+            overflow-x: auto; 
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
-            /* Penting: mencegah tabel hancur di layar kecil */
-            min-width: 600px; /* Minimal lebar tabel agar kolom tidak gepeng */
+            background: var(--bg-container);
+            min-width: 600px;
         }
 
         th, td {
             padding: 10px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--table-border);
             text-align: left;
+            color: var(--text-secondary);
         }
 
         th {
             background: #3498db;
-            color: white;
+            color: var(--table-head-text);
         }
 
         /* HEADER GRUP */
         .edit-box {
-            background: #fff8e1;
+            background: var(--yellow-box);
             padding: 15px;
-            border: 1px solid #ffe082;
+            border: 1px solid var(--yellow-border);
             border-radius: 5px;
             margin-bottom: 20px;
         }
@@ -211,11 +255,11 @@ if (isset($_POST['btnTambahThread'])) {
         /* SEARCH CONTAINER */
         .search-container {
             position: relative;
-            background: #e8f4fd;
+            background: var(--col-bg); /* Mengikuti tema kolom */
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border: 1px solid #b3e5fc;
+            border: 1px solid var(--table-border);
         }
 
         #search-result {
@@ -223,10 +267,10 @@ if (isset($_POST['btnTambahThread'])) {
             position: absolute;
             z-index: 1000;
             width: calc(100% - 30px);
-            background: white;
-            border: 1px solid #ddd;
+            background: var(--bg-container);
+            border: 1px solid var(--table-border);
             border-top: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px var(--shadow);
             max-height: 200px;
             overflow-y: auto;
             border-radius: 0 0 5px 5px;
@@ -234,12 +278,13 @@ if (isset($_POST['btnTambahThread'])) {
 
         .search-item {
             padding: 10px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--table-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: var(--text-secondary);
         }
-        .search-item:hover { background-color: #f5f5f5; }
+        .search-item:hover { background-color: var(--col-bg); }
 
         .tambah-percakapan {
             display: flex;
@@ -258,34 +303,56 @@ if (isset($_POST['btnTambahThread'])) {
         }
         
         .modal-content {
-            background:white; 
+            background: var(--modal-bg);
             width:90%; max-width:400px; 
             margin:100px auto; padding:20px; 
             border-radius:8px; 
             box-shadow:0 4px 10px rgba(0,0,0,0.2); 
             position:relative;
+            color: var(--text-main);
         }
+
+        /* Overrides inside modal for inputs */
+        .modal-content input[readonly] {
+            background-color: var(--col-bg) !important;
+        }
+
+        /* Toggle Button */
+        .theme-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--text-main);
+            color: var(--bg-container);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+        .theme-toggle-btn:hover { transform: scale(1.1); }
 
         /* --- MEDIA QUERY SMARTPHONE --- */
         @media screen and (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 15px; }
 
-            /* Tombol Header */
-            .btn-leave {
+            .btn-leave, .btn-back {
                 float: none;
                 display: block;
                 width: 100%;
                 text-align: center;
                 margin-top: 10px;
             }
-            .btn-back {
-                display: block;
-                width: 100%;
-                text-align: center;
-            }
+            .btn-back { margin-top: 0; }
 
-            /* Form Header menjadi stack penuh */
             .form-header-grup {
                 flex-direction: column;
                 align-items: stretch;
@@ -299,14 +366,23 @@ if (isset($_POST['btnTambahThread'])) {
                 position: relative;
                 width: 100%;
                 box-shadow: none;
-                border-top: 1px solid #ddd;
+                border-top: 1px solid var(--table-border);
             }
         }
     </style>
+    <script>
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
     <script src="js/jquery-3.7.1.js"></script>
 </head>
 
 <body>
+    <button class="theme-toggle-btn" id="themeToggle" title="Ganti Tema">🌓</button>
 
     <div class="container">
         <div style="margin-bottom:15px; overflow:hidden;">
@@ -337,7 +413,7 @@ if (isset($_POST['btnTambahThread'])) {
                     </div>
                     <button type="submit" name="btnUpdateGrup" class="btn btn-save" style="height:35px; margin-bottom:10px;">Simpan</button>
                 </form>
-                <p style="margin:5px 0 0 0;">Kode Join: <strong style="background:#fff; padding:3px;"><?= $grup['kode_pendaftaran'] ?></strong></p>
+                <p style="margin:5px 0 0 0;">Kode Join: <strong class="badge-code" style="color:var(--text-main); background:var(--input-bg); padding:3px;"><?= $grup['kode_pendaftaran'] ?></strong></p>
             </div>
         <?php else: ?>
             <h1><?= htmlspecialchars($grup['nama']) ?></h1>
@@ -350,7 +426,7 @@ if (isset($_POST['btnTambahThread'])) {
                 <h3>Agenda / Event</h3>
 
                 <?php if ($canManageEvent): ?>
-                    <div style="background: #fff; padding: 15px; border: 1px solid #ddd; margin-bottom: 15px; border-radius: 5px;">
+                    <div style="background: var(--bg-container); padding: 15px; border: 1px solid var(--table-border); margin-bottom: 15px; border-radius: 5px;">
                         <h4 style="margin-top:0;"><?= $eventEdit ? "Edit Event" : "Tambah Event Baru" ?></h4>
                         <form method="POST">
                             <input type="hidden" name="idevent_edit" value="<?= $eventEdit ? $eventEdit['idevent'] : '' ?>">
@@ -415,7 +491,7 @@ if (isset($_POST['btnTambahThread'])) {
 
                 <?php if ($isPembuat): ?>
                     <div class="search-container">
-                        <label style="display:block; margin-bottom:5px; font-weight:bold; color:#2c3e50;">
+                        <label style="display:block; margin-bottom:5px; font-weight:bold; color:var(--text-secondary);">
                             Tambah Mahasiswa
                         </label>
 
@@ -438,7 +514,7 @@ if (isset($_POST['btnTambahThread'])) {
                             $resM = $grupObj->getMembers($idgrup);
                             if ($resM->num_rows > 0) {
                                 while ($m = $resM->fetch_assoc()) {
-                                    $roleBadge = ($m['role'] == 'Dosen') ? " <span style='background:gold; padding:2px; font-size:10px;'>Dosen</span>" : "";
+                                    $roleBadge = ($m['role'] == 'Dosen') ? " <span style='background:gold; padding:2px; font-size:10px; color:#000;'>Dosen</span>" : "";
 
                                     echo "<tr>
                                         <td>{$m['id_nomor']}</td>
@@ -493,7 +569,9 @@ if (isset($_POST['btnTambahThread'])) {
                 </div>
             </div>
 
-        </div> <div id="modalTambahThread" class="modal-bg">
+        </div> 
+        
+        <div id="modalTambahThread" class="modal-bg">
             <div class="modal-content">
 
                 <h3 style="margin-top:0;">Buat Thread Baru</h3>
@@ -501,13 +579,13 @@ if (isset($_POST['btnTambahThread'])) {
                 <form method="POST">
                     <div class="form-group" style="margin-bottom:15px;">
                         <label style="display:block; margin-bottom:5px;">Nama Pembuat</label>
-                        <input type="text" value="<?= htmlspecialchars($_SESSION['user']) ?>" readonly style="background:#eee;">
+                        <input type="text" value="<?= htmlspecialchars($_SESSION['user']) ?>" readonly>
                         <input type="hidden" name="username_pembuat" value="<?= htmlspecialchars($_SESSION['user']) ?>">
                     </div>
 
                     <div class="form-group" style="margin-bottom:15px;">
                         <label style="display:block; margin-bottom:5px;">ID Grup</label>
-                        <input type="text" value="<?= $idgrup ?>" readonly style="background:#eee;">
+                        <input type="text" value="<?= $idgrup ?>" readonly>
                         <input type="hidden" name="idgrup" value="<?= $idgrup ?>">
                     </div>
 
@@ -531,11 +609,13 @@ if (isset($_POST['btnTambahThread'])) {
                         <button type="submit" name="btnTambahThread" class="btn btn-save" style="flex:1;">Buat Thread</button>
                     </div>
                 </form>
-                <button onclick="closeTambahThreadModal()" style="position:absolute; top:10px; right:10px; border:none; background:none; font-size:18px; cursor:pointer;">&times;</button>
+                <button onclick="closeTambahThreadModal()" style="position:absolute; top:10px; right:10px; border:none; background:none; font-size:18px; cursor:pointer; color:var(--text-main);">&times;</button>
             </div>
         </div>
 
-    </div> <script>
+    </div> 
+    
+    <script>
         function openTambahThreadModal() {
             $('#modalTambahThread').fadeIn(200);
         }
@@ -585,6 +665,40 @@ if (isset($_POST['btnTambahThread'])) {
                     closeTambahThreadModal();
                 }
             });
+
+            // --- DARK MODE LOGIC ---
+            const themeToggleBtn = document.getElementById('themeToggle');
+            const body = document.body;
+            const html = document.documentElement;
+
+            if (html.classList.contains('dark-mode')) {
+                body.classList.add('dark-mode');
+                html.classList.remove('dark-mode');
+                themeToggleBtn.textContent = '☀️';
+            } else {
+                themeToggleBtn.textContent = '🌙';
+            }
+
+            themeToggleBtn.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    setCookie('theme', 'dark', 365);
+                    themeToggleBtn.textContent = '☀️';
+                } else {
+                    setCookie('theme', 'light', 365);
+                    themeToggleBtn.textContent = '🌙';
+                }
+            });
+
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
+            }
         });
     </script>
 </body>

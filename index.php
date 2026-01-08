@@ -49,28 +49,61 @@ if (isset($_POST['btnJoin'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-body: #f0f2f5;
+            --bg-container: #fff;
+            --text-main: #2c3e50;
+            --text-secondary: #333;
+            --form-bg: #eef2f5;
+            --form-border: #ddd;
+            --input-bg: #fff;
+            --input-text: #000;
+            --table-hover: #f2f2f2;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --yellow-box: #fff8e1;
+        }
+
+        /* Dark Mode Override */
+        body.dark-mode {
+            --bg-body: #18191a;
+            --bg-container: #242526;
+            --text-main: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --form-bg: #3a3b3c;
+            --form-border: #555;
+            --input-bg: #3a3b3c;
+            --input-text: #e4e6eb;
+            --table-hover: #3a3b3c;
+            --shadow: rgba(255, 255, 255, 0.1);
+            --yellow-box: #4a4218;
+        }
+
         * {
             box-sizing: border-box;
         }
 
         body {
             font-family: sans-serif;
-            background: #f0f2f5;
+            background: var(--bg-body);
+            color: var(--text-secondary);
             padding: 20px;
             margin: 0;
+            transition: background 0.3s, color 0.3s;
         }
 
         .container {
             max-width: 1100px;
             margin: auto;
-            background: #fff;
+            background: var(--bg-container);
             padding: 30px;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: background 0.3s;
         }
 
         h1, h2, h3 {
-            color: #2c3e50;
+            color: var(--text-main);
         }
 
         /* --- BUTTON STYLES --- */
@@ -85,46 +118,38 @@ if (isset($_POST['btnJoin'])) {
             display: inline-block;
         }
 
-        .btn-logout {
-            background: #e74c3c;
+        /* Header Buttons Container */
+        .header-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
-        .btn-change-password {
-            background: #3498db;
-        }
-
-        .btn-save {
-            background: #2ecc71;
-            width: 100%;
-            padding: 10px;
-        }
-
-        .btn-kelola {
-            background: #3498db;
-        }
-
-        .btn-view {
-            background: #f39c12;
-        }
+        .btn-logout { background: #e74c3c; }
+        .btn-change-password { background: #8e44ad; }
+        .btn-save { background: #2ecc71; width: 100%; padding: 10px; }
+        .btn-kelola { background: #3498db; }
+        .btn-view { background: #f39c12; }
 
         /* --- FORM STYLES --- */
         .form-box {
-            background: #eef2f5;
+            background: var(--form-bg);
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--form-border);
         }
 
-        .form-group {
-            margin-bottom: 10px;
-        }
+        .form-group { margin-bottom: 10px; }
 
         input, select, textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--form-border);
             border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--input-text);
         }
 
         /* --- TABLE STYLES --- */
@@ -133,7 +158,7 @@ if (isset($_POST['btnJoin'])) {
             border-collapse: collapse;
             margin-top: 10px;
             margin-bottom: 30px;
-            table-layout: fixed; /* Fixed layout agar rapi di desktop */
+            table-layout: fixed;
         }
 
         th {
@@ -145,80 +170,97 @@ if (isset($_POST['btnJoin'])) {
 
         td {
             padding: 10px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--form-border);
             word-wrap: break-word;
+            color: var(--text-secondary);
+        }
+        
+        tr:hover {
+            background-color: var(--table-hover);
         }
 
         .badge-code {
-            background: #2c3e50;
-            color: #fff;
+            background: var(--text-main);
+            color: var(--bg-container);
             padding: 3px 6px;
             border-radius: 3px;
             font-family: monospace;
         }
 
-        /* --- LAYOUT UTAMA --- */
-        .flex-row {
+        /* Override dark mode untuk kotak kuning (join grup) */
+        body.dark-mode .form-box[style*="background"] {
+            background: var(--yellow-box) !important;
+            border-color: #665c26;
+        }
+
+        /* --- TOGGLE THEME BUTTON --- */
+        .theme-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--text-main);
+            color: var(--bg-container);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            font-size: 24px;
             display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
         }
 
-        .flex-col {
-            flex: 1;
-            min-width: 300px;
-        }
+        /* --- LAYOUT UTAMA --- */
+        .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .flex-col { flex: 1; min-width: 300px; }
 
-        /* --- RESPONSIVE CSS (MEDIA QUERY) --- */
+        /* --- RESPONSIVE CSS --- */
         @media screen and (max-width: 768px) {
-            
-            body {
-                padding: 10px;
+            body { padding: 10px; }
+            .container { padding: 15px; width: 100%; }
+            .header-buttons { 
+                flex-direction: row; 
+                justify-content: center;
+                gap: 10px; 
+                flex-wrap: wrap;
+            }
+            .btn-change-password, .btn-logout { 
+                width: auto;
             }
 
-            .container {
-                padding: 15px;
-                width: 100%;
-            }
-
-            .flex-row {
-                flex-direction: column;
-            }
-
-            .flex-col {
-                width: 100%;
-            }
-
-            .btn-change-password, .btn-logout {
-                float: none;
-                display: block;
-                width: fit-content; 
-                margin: 0 auto 15px auto; 
-                text-align: center;
-            }
-
-            table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-                table-layout: auto;
-            }
-
-            th, td {
-                min-width: 120px; 
-            }
-            
-            .btn-kelola, .btn-logout, .btn-view, .btn-change-password {
-                padding: 6px 10px;
-                font-size: 14px;
-                margin-bottom: 2px;
-            }
+            .flex-row { flex-direction: column; }
+            .flex-col { width: 100%; }
+            table { display: block; overflow-x: auto; white-space: nowrap; table-layout: auto; }
+            th, td { min-width: 120px; }
+            .btn-kelola, .btn-logout, .btn-view, .btn-change-password { padding: 6px 10px; font-size: 14px; margin-bottom: 2px; }
         }
     </style>
+    
+    <script>
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme) {
+                const theme = savedTheme.split('=')[1];
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                }
+            }
+        })();
+    </script>
 </head>
 
 <body>
     <?= $pesan ?>
+    
+    <button class="theme-toggle-btn" id="themeToggle" title="Ganti Tema">🌓</button>
+
     <div class="container">
         <?php if ($isDosen): ?>
             <h1 style="clear:both;">Dashboard Dosen</h1>
@@ -448,8 +490,10 @@ if (isset($_POST['btnJoin'])) {
             </div>
 
         <?php endif; ?>
-        <a href="change_password.php" class="btn btn-change-password">Change Password</a>
-        <a href="process/proses_logout.php" class="btn btn-logout">Logout</a>
+        <div class="header-buttons">
+            <a href="change_password.php" class="btn btn-change-password">Change Password</a>
+            <a href="process/proses_logout.php" class="btn btn-logout">Logout</a>
+        </div>
     </div>
 
     <div id="modalJoin" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
@@ -493,9 +537,42 @@ if (isset($_POST['btnJoin'])) {
                 $('#modalJoin').hide();
             }
         });
+
+        // --- DARK MODE LOGIC ---
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const body = document.body;
+        const html = document.documentElement;
+
+        // Apply theme dari head script logic ke body agar konsisten
+        if (html.classList.contains('dark-mode')) {
+            body.classList.add('dark-mode');
+            html.classList.remove('dark-mode');
+            themeToggleBtn.textContent = '☀️';
+        } else {
+            themeToggleBtn.textContent = '🌙';
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                setCookie('theme', 'dark', 365);
+                themeToggleBtn.textContent = '☀️';
+            } else {
+                setCookie('theme', 'light', 365);
+                themeToggleBtn.textContent = '🌙';
+            }
+        });
+
+        function setCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
     </script>
 
-
 </body>
-
 </html>
