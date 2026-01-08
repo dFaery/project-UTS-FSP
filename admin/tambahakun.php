@@ -4,14 +4,14 @@ if (isset($_SESSION['user'])) {
     $username = $_SESSION['user'];
     $isadmin = $_SESSION['is_admin'];
     if ($isadmin != 1) {
-        header("Location: login.php");
+        header("Location: ../login.php");
     }
 } else {
-    header("Location: login.php");
+    header("Location: ../login.php");
 }
 
-require_once("class/dosen.php");
-require_once("class/mahasiswa.php");
+require_once("../class/dosen.php");
+require_once("../class/mahasiswa.php");
 $dosen = new Dosen();
 $mahasiswa = new Mahasiswa();
 
@@ -142,7 +142,7 @@ if (isset($_POST['submit-dosen'])) {
 <body>
     <div class="container">
         <h1>Form Buat Akun</h1>
-        <form action="proses_tambah_akun.php" method="POST" enctype="multipart/form-data">
+        <form action="../process/proses_tambah_akun.php" method="POST" enctype="multipart/form-data">
             <?php
             if (isset($npk)) {
                 $id = $npk;

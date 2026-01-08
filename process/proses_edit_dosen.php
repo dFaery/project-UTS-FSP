@@ -1,5 +1,5 @@
 <?php
-require_once("class/dosen.php");
+require_once("../class/dosen.php");
 $dosen = new Dosen();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['npk_asli'])) {
@@ -32,7 +32,7 @@ if (isset($_POST['update-dosen'])) {
 
         if (in_array($extension, $allowed_extensions)) {
             $foto_extension = $extension;
-            $target_file = "images/" . $npk . '_' . $nama . '.' . $foto_extension;
+            $target_file = "../images/" . $npk . '_' . $nama . '.' . $foto_extension;
 
             if (!move_uploaded_file($_FILES['foto']['tmp_name'], $target_file)) {
                 die("Gagal mengupload file.");

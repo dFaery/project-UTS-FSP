@@ -1,5 +1,5 @@
 <?php
-require_once("class/dosen.php");
+require_once("../class/dosen.php");
 
 $dosen = new Dosen();
 if (!isset($_GET['npk'])) {

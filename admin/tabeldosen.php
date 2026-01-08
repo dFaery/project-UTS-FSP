@@ -4,13 +4,13 @@ if(isset($_SESSION['user'])){
     $username = $_SESSION['user'];
     $isadmin = $_SESSION['is_admin'];
     if($isadmin != 1){
-        header("Location: login.php");
+        header("Location: ../login.php");
     }
 }
 else{
-    header("Location: login.php");
+    header("Location: ../login.php");
 }
-require_once("class/dosen.php");
+require_once("../class/dosen.php");
 
 if(isset($_GET['dstatus'])){
     if($_GET['dstatus'] == 'success') echo "<script>alert('Berhasil menambahkan akun Dosen');</script>";
@@ -35,6 +35,10 @@ $PER_PAGE = 5;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tabel Dosen</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: sans-serif;
             background-color: #f0f2f5;
@@ -90,6 +94,9 @@ $PER_PAGE = 5;
             text-decoration: none;
             color: white;
             font-weight: bold;
+            font-size: 14px;
+            display: inline-block;
+            margin: 2px 0;
         }
 
         .edit-btn {
@@ -116,6 +123,7 @@ $PER_PAGE = 5;
             text-decoration: none;
             border-radius: 5px;
             margin-bottom: 20px;
+            text-align: center;
         }
 
         .btn-back {
@@ -125,12 +133,15 @@ $PER_PAGE = 5;
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            text-align: center;
         }
 
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .form-group {
@@ -143,7 +154,6 @@ $PER_PAGE = 5;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            box-sizing: border-box;
         }
 
         .form-group button {
@@ -156,35 +166,24 @@ $PER_PAGE = 5;
             cursor: pointer;
         }
 
-        #btn-paging {
-            display: flex;
-            width: fit-content;
-            /* geser balik biar center */
-            justify-content: center;
-            padding: 10px;
-            background-color: white;
-            border-radius: 12px;
-        }
-
         .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .btn-page {
             text-decoration: none;
             height: fit-content;
             color: #2c3e50;
-            background-color: none;
             border: 1px solid #ccc;
             border-radius: 8px;
-            padding: 8px 8px;
-            margin: 0 4px;
+            padding: 8px 12px;
             transition: background-color 0.3s ease;
         }
-
 
         .btn-page:hover {
             background-color: #3498db;
@@ -194,33 +193,79 @@ $PER_PAGE = 5;
 
         .btn-next,
         .btn-previous,
-        .btn-first,
-        .btn-last {
-            text-decoration: none;
-            color: #2c3e50;
-            padding: 8px 12px;
-            margin: 0 4px;
-            font-weight: 500;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
         .btn-next-disabled,
         .btn-previous-disabled {
-            width: 64px;
             text-decoration: none;
-            color: #aaa;
             padding: 8px 12px;
-            margin: 0 4px;
             font-weight: 500;
+            border-radius: 4px;
+        }
+
+        .btn-next, .btn-previous {
+            color: #2c3e50;
+            transition: color 0.3s ease;
+        }
+
+        .btn-next:hover, .btn-previous:hover {
+            color: #3498db;
+        }
+
+        .btn-next-disabled, .btn-previous-disabled {
+            color: #aaa;
             cursor: not-allowed;
         }
 
-        .btn-next:hover,
-        .btn-previous:hover,
-        .btn-first:hover,
-        .btn-last:hover {
-            color: #3498db;
-            transition: color 0.3s ease;
+        /* --- RESPONSIVE MEDIA QUERY (SMARTPHONE) --- */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+            
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn-add, .btn-back {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            /* TABLE RESPONSIVE (SCROLL) */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap; 
+            }
+
+            .photo-thumbnail {
+                width: 50px; 
+                height: 50px;
+            }
+
+            .pagination {
+                gap: 2px;
+            }
+            
+            .btn-page, .btn-next, .btn-previous, .btn-next-disabled, .btn-previous-disabled {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -229,15 +274,15 @@ $PER_PAGE = 5;
     <div class="container">
         <h1>Tabel Dosen</h1>
         <div class="top-bar">
-            <form action="" method="get">
+            <form action="" method="get" style="flex: 1;">
                 <div class="form-group">
                     <input type="text" name="cari" id="" placeholder="Cari NPK atau Nama" value="<?php echo isset($_GET['cari']) ? htmlspecialchars($_GET['cari']) : ''; ?>">
                     <button type="submit">Cari</button>
                 </div>
             </form>
             <div class="btn-group">
-                <a href="adminhome.php" class="btn-back">Kembali</a>
                 <a href="tambahdosen.php" class="btn-add">Tambah Dosen Baru</a>
+                <a href="adminhome.php" class="btn-back">Kembali</a>
             </div>
         </div>
 
@@ -271,7 +316,7 @@ $PER_PAGE = 5;
 
                         echo "<tr>";
                         echo "<td>";
-                        $foto_path = "images/" . $npk . '_' . $nama . '.' . $foto_ext;;
+                        $foto_path = "../images/" . $npk . '_' . $nama . '.' . $foto_ext;;
                         if (file_exists($foto_path) && !empty($foto_ext)) {
                             echo "<img src='" . htmlspecialchars($foto_path) . "' alt='Foto " . htmlspecialchars($nama) . "' class='photo-thumbnail'>";
                         } else {
@@ -282,8 +327,8 @@ $PER_PAGE = 5;
                         echo "<td>" . htmlspecialchars($npk) . "</td>";
                         echo "<td>" . htmlspecialchars($nama) . "</td>";
                         echo "<td>";
-                        echo "<a href='editdosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn edit-btn'>Edit</a> | ";
-                        echo "<a href='proses_hapus_dosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
+                        echo "<a href='editdosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn edit-btn'>Edit</a> "; // Hilangkan pipe | agar rapi
+                        echo "<a href='../process/proses_hapus_dosen.php?npk=" . htmlspecialchars($npk) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
                         echo "</td>";
                         echo "</tr>";
                     }

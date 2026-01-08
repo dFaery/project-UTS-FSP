@@ -1,5 +1,5 @@
     <?php
-    require_once("data.php");
+    require_once(__DIR__ . "/../config/data.php");
 
     class classParent
     {

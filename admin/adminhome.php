@@ -4,11 +4,11 @@ if(isset($_SESSION['user'])){
     $username = $_SESSION['user'];
     $isadmin = $_SESSION['is_admin'];
     if($isadmin != 1){
-        header("Location: login.php");
+        header("Location: ../login.php");
     }
 }
 else{
-    header("Location: login.php");
+    header("Location: ../login.php");
 }
 ?>
 <!DOCTYPE html>
@@ -96,7 +96,7 @@ else{
         <div class="button-group">
             <a href="tabeldosen.php" class="btn">Kelola Tabel Dosen</a>
             <a href="tabelmahasiswa.php" class="btn mahasiswa">Kelola Tabel Mahasiswa</a>
-            <a href="proses_logout.php" class="btn logout">Logout</a>
+            <a href="../process/proses_logout.php" class="btn logout">Logout</a>
         </div>
     </div>
 </body>

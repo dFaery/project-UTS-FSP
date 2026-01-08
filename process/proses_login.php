@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once("class/akun.php");
+require_once("../class/akun.php");
 $akun = new Akun();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -20,15 +20,15 @@ if (isset($_POST['login'])) {
     $result = $akun->login($username, $password);
     if ($result === false) {
         echo "Account not found ";        
-        echo "<br><a href='login.php'>Kembali ke Halaman Login</a>";
+        echo "<br><a href='../login.php'>Kembali ke Halaman Login</a>";
     } else {
         $_SESSION['user'] = $result['username'];
         $_SESSION['is_admin'] = $result['isadmin'];
 
         if ($result['isadmin'] == 1) {
-            header("Location: adminhome.php");
+            header("Location: ../admin/adminhome.php");
         } else {
-            header("Location: index.php");
+            header("Location: ../index.php");
         }
     }
 }

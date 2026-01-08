@@ -7,7 +7,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
-    header("Location: adminhome.php");
+    header("Location: admin/adminhome.php");
     exit();
 }
 
@@ -46,12 +46,18 @@ if (isset($_POST['btnJoin'])) {
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: sans-serif;
             background: #f0f2f5;
             padding: 20px;
+            margin: 0;
         }
 
         .container {
@@ -63,12 +69,11 @@ if (isset($_POST['btnJoin'])) {
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        h1,
-        h2,
-        h3 {
+        h1, h2, h3 {
             color: #2c3e50;
         }
 
+        /* --- BUTTON STYLES --- */
         .btn {
             padding: 8px 12px;
             border: none;
@@ -77,11 +82,15 @@ if (isset($_POST['btnJoin'])) {
             cursor: pointer;
             text-decoration: none;
             font-weight: bold;
+            display: inline-block;
         }
 
         .btn-logout {
             background: #e74c3c;
-            float: right;
+        }
+
+        .btn-change-password {
+            background: #3498db;
         }
 
         .btn-save {
@@ -98,6 +107,7 @@ if (isset($_POST['btnJoin'])) {
             background: #f39c12;
         }
 
+        /* --- FORM STYLES --- */
         .form-box {
             background: #eef2f5;
             padding: 20px;
@@ -110,22 +120,20 @@ if (isset($_POST['btnJoin'])) {
             margin-bottom: 10px;
         }
 
-        input,
-        select,
-        textarea {
+        input, select, textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box;
         }
 
+        /* --- TABLE STYLES --- */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
             margin-bottom: 30px;
-            table-layout: fixed;
+            table-layout: fixed; /* Fixed layout agar rapi di desktop */
         }
 
         th {
@@ -149,13 +157,62 @@ if (isset($_POST['btnJoin'])) {
             font-family: monospace;
         }
 
+        /* --- LAYOUT UTAMA --- */
         .flex-row {
             display: flex;
             gap: 20px;
+            flex-wrap: wrap;
         }
 
         .flex-col {
             flex: 1;
+            min-width: 300px;
+        }
+
+        /* --- RESPONSIVE CSS (MEDIA QUERY) --- */
+        @media screen and (max-width: 768px) {
+            
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+
+            .flex-row {
+                flex-direction: column;
+            }
+
+            .flex-col {
+                width: 100%;
+            }
+
+            .btn-change-password, .btn-logout {
+                float: none;
+                display: block;
+                width: fit-content; 
+                margin: 0 auto 15px auto; 
+                text-align: center;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                table-layout: auto;
+            }
+
+            th, td {
+                min-width: 120px; 
+            }
+            
+            .btn-kelola, .btn-logout, .btn-view, .btn-change-password {
+                padding: 6px 10px;
+                font-size: 14px;
+                margin-bottom: 2px;
+            }
         }
     </style>
 </head>
@@ -163,10 +220,8 @@ if (isset($_POST['btnJoin'])) {
 <body>
     <?= $pesan ?>
     <div class="container">
-        <a href="proses_logout.php" class="btn btn-logout">Logout</a>
-
         <?php if ($isDosen): ?>
-            <h1>Dashboard Dosen</h1>
+            <h1 style="clear:both;">Dashboard Dosen</h1>
 
             <div class="flex-row">
                 <div class="flex-col form-box">
@@ -197,6 +252,7 @@ if (isset($_POST['btnJoin'])) {
             </div>
 
             <h3>Grup Saya (Pemilik)</h3>
+            <div style="overflow-x:auto;">
             <table>
                 <thead>
                     <tr>
@@ -232,11 +288,12 @@ if (isset($_POST['btnJoin'])) {
                     ?>
                 </tbody>
             </table>
+            </div>
 
-            </table>
             <hr style="border:0; border-top:1px dashed #ccc; margin:30px 0;">
 
             <h3>Grup yang Saya Ikuti (Tim Dosen)</h3>
+            <div style="overflow-x:auto;">
             <table>
                 <thead>
                     <tr>
@@ -271,8 +328,10 @@ if (isset($_POST['btnJoin'])) {
                     ?>
                 </tbody>
             </table>
+            </div>
 
             <h3>Grup Publik (Dosen Lain)</h3>
+            <div style="overflow-x:auto;">
             <table>
                 <thead>
                     <tr>
@@ -308,12 +367,14 @@ if (isset($_POST['btnJoin'])) {
                     ?>
                 </tbody>
             </table>
+            </div>
 
         <?php else: ?>
 
-            <h1>Dashboard Mahasiswa</h1>
+            <h1 style="clear:both;">Dashboard Mahasiswa</h1>
 
             <h3>Grup yang Saya Ikuti</h3>
+            <div style="overflow-x:auto;">
             <table>
                 <thead>
                     <tr>
@@ -344,8 +405,10 @@ if (isset($_POST['btnJoin'])) {
                     ?>
                 </tbody>
             </table>
+            </div>
 
             <h3>Jelajahi Grup Publik</h3>
+            <div style="overflow-x:auto;">
             <table>
                 <thead>
                     <tr>
@@ -371,7 +434,7 @@ if (isset($_POST['btnJoin'])) {
                                     <button type='button' class='btn btn-save' 
                                             style='padding:5px 10px; width:auto; font-size:12px;'
                                             onclick='openJoinModal(\"" . htmlspecialchars($r['nama']) . "\", \"" . htmlspecialchars($r['nama_dosen']) . "\")'>
-                                        Gabung
+                                    Gabung
                                     </button>
                                 </td>
                             </tr>";
@@ -382,12 +445,15 @@ if (isset($_POST['btnJoin'])) {
                     ?>
                 </tbody>
             </table>
+            </div>
 
         <?php endif; ?>
+        <a href="change_password.php" class="btn btn-change-password">Change Password</a>
+        <a href="process/proses_logout.php" class="btn btn-logout">Logout</a>
     </div>
 
     <div id="modalJoin" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
-        <div style="background:white; width:400px; margin:100px auto; padding:20px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.2); position:relative;">
+        <div style="background:white; width:90%; max-width:400px; margin:100px auto; padding:20px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.2); position:relative;">
 
             <h3 style="margin-top:0;">Masukkan Kode Grup</h3>
             <p>Anda akan bergabung ke grup: <br><b id="modalGrupName" style="color:#2c3e50;">-</b></p>
@@ -408,7 +474,7 @@ if (isset($_POST['btnJoin'])) {
         </div>
     </div>
 
-    <script src="jquery-3.7.1.js"></script>
+    <script src="js/jquery-3.7.1.js"></script>
     <script>
         function openJoinModal(namaGrup, namaDosen) {
             $('#modalGrupName').text(namaGrup);

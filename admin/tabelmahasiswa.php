@@ -4,11 +4,11 @@ if(isset($_SESSION['user'])){
     $username = $_SESSION['user'];
     $isadmin = $_SESSION['is_admin'];
     if($isadmin != 1){
-        header("Location: login.php");
+        header("Location: ../login.php");
     }
 }
 else{
-    header("Location: login.php");
+    header("Location: ../login.php");
 }
 
 if(isset($_GET['mstatus'])){
@@ -16,7 +16,7 @@ if(isset($_GET['mstatus'])){
     if($_GET['mstatus'] == 'fail') echo "<script>alert('Gagal menambahkan akun Mahasiswa, NRP sudah terdaftar');</script>";
 }
 
-require_once("class/mahasiswa.php");
+require_once("../class/mahasiswa.php");
 
 $mysqli = new mysqli("localhost", "root", "", "fullstack");
 if ($mysqli->connect_errno) {
@@ -36,6 +36,10 @@ $PER_PAGE = 5;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tabel Mahasiswa</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: sans-serif;
             background-color: #f0f2f5;
@@ -45,7 +49,6 @@ $PER_PAGE = 5;
 
         .container {
             max-width: 1200px;
-            /* Ubah nilai ini */
             margin: 0 auto;
             background-color: #fff;
             padding: 20px;
@@ -59,6 +62,7 @@ $PER_PAGE = 5;
             margin-bottom: 20px;
         }
 
+        /* --- TABLE STYLES --- */
         .table {
             width: 100%;
             border-collapse: collapse;
@@ -76,6 +80,7 @@ $PER_PAGE = 5;
             background-color: #3498db;
             color: white;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .table tbody tr:nth-child(even) {
@@ -86,12 +91,16 @@ $PER_PAGE = 5;
             background-color: #e9ecef;
         }
 
+        /* --- BUTTON STYLES --- */
         .aksi-btn {
             padding: 8px 12px;
             border-radius: 5px;
             text-decoration: none;
             color: white;
             font-weight: bold;
+            font-size: 14px;
+            display: inline-block;
+            margin: 2px 0;
         }
 
         .edit-btn {
@@ -118,6 +127,7 @@ $PER_PAGE = 5;
             text-decoration: none;
             border-radius: 5px;
             margin-bottom: 20px;
+            text-align: center;
         }
 
         .btn-back {
@@ -127,12 +137,16 @@ $PER_PAGE = 5;
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            text-align: center;
         }
 
+        /* --- LAYOUT UTAMA --- */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .form-group {
@@ -145,7 +159,6 @@ $PER_PAGE = 5;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            box-sizing: border-box;
         }
 
         .form-group button {
@@ -158,35 +171,25 @@ $PER_PAGE = 5;
             cursor: pointer;
         }
 
-        #btn-paging {
-            display: flex;
-            width: fit-content;
-            /* geser balik biar center */
-            justify-content: center;
-            padding: 10px;
-            background-color: white;
-            border-radius: 12px;
-        }
-
+        /* --- PAGINATION --- */
         .pagination {
             display: flex;
             justify-content: center;
             align-items: center;
             margin-top: 20px;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         .btn-page {
             text-decoration: none;
             height: fit-content;
             color: #2c3e50;
-            background-color: none;
             border: 1px solid #ccc;
             border-radius: 8px;
-            padding: 8px 8px;
-            margin: 0 4px;
+            padding: 8px 12px;
             transition: background-color 0.3s ease;
         }
-
 
         .btn-page:hover {
             background-color: #3498db;
@@ -195,31 +198,76 @@ $PER_PAGE = 5;
         }
 
         .btn-next,
-        .btn-previous {
-            width: 64px;
+        .btn-previous,
+        .btn-next-disabled,
+        .btn-previous-disabled {
             text-decoration: none;
-            color: #2c3e50;
             padding: 8px 12px;
-            margin: 0 4px;
             font-weight: 500;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 4px;
         }
 
-        .btn-next:hover,
-        .btn-previous:hover {
-            color: #3498db;
+        .btn-next, .btn-previous {
+            color: #2c3e50;
             transition: color 0.3s ease;
         }
 
-        .btn-next-disabled,
-        .btn-previous-disabled {
-            width: 64px;
-            text-decoration: none;
+        .btn-next:hover, .btn-previous:hover {
+            color: #3498db;
+        }
+
+        .btn-next-disabled, .btn-previous-disabled {
             color: #aaa;
-            padding: 8px 12px;
-            margin: 0 4px;
-            font-weight: 500;
             cursor: not-allowed;
+        }
+
+        /* --- RESPONSIVE MEDIA QUERY (SMARTPHONE) --- */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+
+            /* Stack Top Bar */
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn-add, .btn-back {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .photo-thumbnail {
+                width: 50px;
+                height: 50px;
+            }
+
+            .btn-page, .btn-next, .btn-previous, .btn-next-disabled, .btn-previous-disabled {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -229,23 +277,23 @@ $PER_PAGE = 5;
         <h1>Tabel Mahasiswa</h1>
 
         <div class="top-bar">
-            <form action="" method="get">
+            <form action="" method="get" style="flex: 1;">
                 <div class="form-group">
                     <input type="text" name="cari" id="" placeholder="Cari NRP atau Nama" value="<?php echo isset($_GET['cari']) ? htmlspecialchars($_GET['cari']) : ''; ?>">
                     <button type="submit">Cari</button>
                 </div>
             </form>
             <div class="btn-group">
-                <a href="adminhome.php" class="btn-back">Kembali</a>
                 <a href="tambahmahasiswa.php" class="btn-add">Tambah Mahasiswa</a>
+                <a href="adminhome.php" class="btn-back">Kembali</a>
             </div>
         </div>
 
         <?php
         $cari = isset($_GET['cari']) ? $_GET['cari'] : "";
-
         $cari_persen = "%" . $cari . "%";
         ?>
+        
         <table class="table">
             <thead>
                 <tr>
@@ -274,7 +322,7 @@ $PER_PAGE = 5;
 
                         echo "<tr>";
                         echo "<td>";
-                        $foto_path = "images/" . $nrp . "." . $foto_ext;
+                        $foto_path = "../images/" . $nrp . "." . $foto_ext;
                         if (file_exists($foto_path) && !empty($foto_ext)) {
                             echo "<img src='" . htmlspecialchars($foto_path) . "' alt='Foto " . htmlspecialchars($nama) . "' class='photo-thumbnail'>";
                         } else {
@@ -288,13 +336,15 @@ $PER_PAGE = 5;
                         echo "<td>" . htmlspecialchars($tgllahir) . "</td>";
                         echo "<td>" . htmlspecialchars($angkatan) . "</td>";
                         echo "<td>";
-                        echo "<a href='editmahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn edit-btn'>Edit</a> | ";
-                        echo "<a href='proses_hapus_mahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
+                        // Menghapus separator | agar layout tombol rapi di HP
+                        echo "<a href='editmahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn edit-btn'>Edit</a> "; 
+                        echo "<a href='../process/proses_hapus_mahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
                         echo "</td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='4'>Tidak ada data mahasiswa.</td></tr>";
+                    // Update colspan menjadi 7 karena jumlah kolom ada 7
+                    echo "<tr><td colspan='7'>Tidak ada data mahasiswa.</td></tr>";
                 }
 
                 $mysqli->close();
@@ -305,9 +355,6 @@ $PER_PAGE = 5;
         <div class="pagination">
             <?php
             $res = $mahasiswa->getMahasiswa($cari_persen);
-
-            // // paging first
-            // echo "<a href='?start=0&cari=$cari' class='btn-first'>First </a>"; 
 
             if ($offset > 0) {
                 $prev = $offset - $PER_PAGE;
@@ -331,12 +378,7 @@ $PER_PAGE = 5;
                 $next = $offset;
                 echo "<a href='?start=$next&cari=$cari' class='btn-next-disabled'>Next</a>";
             }
-
-            // // paging last
-            // $last_page = ($maks_page - 1) * $PER_PAGE;
-            // echo "<a href='?start=$last_page&cari=$cari' class='btn-last'> Last</a>";
             ?>
-
         </div>
     </div>
     <script src="jquery-3.7.1.js"></script>

@@ -6,10 +6,9 @@
         $username = $_SESSION['user'];
         $isadmin = $_SESSION['is_admin'];                
         if ($isadmin == 1) {
-            header("Location: adminhome.php");
+            header("Location: admin/adminhome.php");
         }
     }
-    $username = $_POST['username'];
     ?>
     <!DOCTYPE html>
     <html lang="en">
@@ -92,7 +91,7 @@
     <body>
         <div class="container">
             <h2>Change Password</h2>
-            <form action="proses_change_password.php" method="post">
+            <form action="process/proses_change_password.php" method="post">
 
                 <div class="form-group">
                     <label for="username">Username:</label>
@@ -115,7 +114,7 @@
                 <button type="submit" name="change_password" class="change_password" disabled>Change Password</button>
             </form>
         </div>
-        <script src="jquery-3.7.1.js"></script>
+        <script src="js/jquery-3.7.1.js"></script>
         <script>
             $(document).ready(function() {
                 $('#password, #re_enter_password').keyup(function() {

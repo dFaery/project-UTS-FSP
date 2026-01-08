@@ -1,9 +1,9 @@
 <?php
 session_start();
 require_once("class/akun.php");
-require_once("class/dosen.php");
-require_once("class/mahasiswa.php");
-echo "<script src='jquery-3.7.1.js'></script>";
+require_once("../class/dosen.php");
+require_once("../class/mahasiswa.php");
+echo "<script src='../js/jquery-3.7.1.js'></script>";
 
 $akun = new Akun();
 $username = $_POST['username'];

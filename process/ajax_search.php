@@ -1,5 +1,5 @@
 <?php
-require_once("class/Grup.php"); 
+require_once("../class/Grup.php"); 
 $grupObj = new Grup();
 
 if(isset($_POST['keyword']) && isset($_POST['idgrup'])) {

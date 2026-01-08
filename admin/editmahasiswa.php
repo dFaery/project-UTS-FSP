@@ -4,14 +4,14 @@ if(isset($_SESSION['user'])){
     $username = $_SESSION['user'];
     $isadmin = $_SESSION['is_admin'];
     if($isadmin != 1){
-        header("Location: login.php");
+        header("Location: ../login.php");
     }
 }
 else{
-    header("Location: login.php");
+    header("Location: ../login.php");
 }
 
-require_once("class/mahasiswa.php");
+require_once("../class/mahasiswa.php");
 $mahasiswa = new Mahasiswa();
 
 if (!isset($_GET['nrp'])) {
@@ -49,7 +49,7 @@ $mahasiswa = $result->fetch_assoc();
 <body>
     <div class="container">
         <h1>Form Edit Mahasiswa</h1>
-        <form action="proses_edit_mahasiswa.php" method="POST" enctype="multipart/form-data">
+        <form action="../process/proses_edit_mahasiswa.php" method="POST" enctype="multipart/form-data">
             <input type="hidden" name="nrp_asli" value="<?php echo htmlspecialchars($mahasiswa['nrp']); ?>">
             
             <div class="form-group">
@@ -79,7 +79,7 @@ $mahasiswa = $result->fetch_assoc();
                 <label for="foto">Ganti Foto (Kosongkan jika tidak ingin ganti)</label>                
                 <?php
                 if (!empty($mahasiswa['foto_extension'])) {
-                    $foto_path = "images/" . $mahasiswa['nrp'] . "." . $mahasiswa['foto_extension'];                    
+                    $foto_path = "../images/" . $mahasiswa['nrp'] . "." . $mahasiswa['foto_extension'];                    
                     echo "<img src='" . $foto_path . "' alt='Foto saat ini' class='current-photo'>";                                        
                 }
                 ?>
