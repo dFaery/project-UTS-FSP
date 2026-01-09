@@ -14,6 +14,15 @@ class Thread extends classParent
         $stmt->execute();
         return $stmt->get_result();
     }
+    
+    public function getThreadById($idThread){
+        $stmt = $this->mysqli->prepare("SELECT * FROM thread WHERE idthread = ?");
+        $stmt->bind_param("i", $idThread);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        return $result->fetch_assoc();
+    }
 
     public function insertThreadByGroupId($username_pembuat, $idgrup, $status){
         $tanggal_pembuatan = new DateTime('now');
@@ -23,5 +32,6 @@ class Thread extends classParent
         $stmt->bind_param("siss", $username_pembuat, $idgrup, $tanggal_pembuatan_format, $status);
         return $stmt->execute();
     }
+
 }
 ?>
