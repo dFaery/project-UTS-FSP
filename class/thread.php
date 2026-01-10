@@ -8,14 +8,16 @@ class Thread extends classParent
         parent::__construct();
     }
 
-    public function getThreadByGroupId($idgrup){
+    public function getThreadByGroupId($idgrup)
+    {
         $stmt = $this->mysqli->prepare("SELECT * FROM thread WHERE idgrup = ?");
         $stmt->bind_param("i", $idgrup);
         $stmt->execute();
         return $stmt->get_result();
     }
-    
-    public function getThreadById($idThread){
+
+    public function getThreadById($idThread)
+    {
         $stmt = $this->mysqli->prepare("SELECT * FROM thread WHERE idthread = ?");
         $stmt->bind_param("i", $idThread);
         $stmt->execute();
@@ -24,14 +26,21 @@ class Thread extends classParent
         return $result->fetch_assoc();
     }
 
-    public function insertThreadByGroupId($username_pembuat, $idgrup, $status){
+    public function insertThreadByGroupId($username_pembuat, $idgrup, $status)
+    {
         $tanggal_pembuatan = new DateTime('now');
-        $tanggal_pembuatan_format = $tanggal_pembuatan->format('Y-m-d H:i:s');        
-        $sql = "INSERT INTO thread (username_pembuat, idgrup, tanggal_pembuatan, status) VALUES (?,?,?,?)";        
+        $tanggal_pembuatan_format = $tanggal_pembuatan->format('Y-m-d H:i:s');
+        $sql = "INSERT INTO thread (username_pembuat, idgrup, tanggal_pembuatan, status) VALUES (?,?,?,?)";
         $stmt = $this->mysqli->prepare($sql);
         $stmt->bind_param("siss", $username_pembuat, $idgrup, $tanggal_pembuatan_format, $status);
         return $stmt->execute();
     }
 
+    public function isOwner($threadId, $username)
+    {
+        $stmt = $this->mysqli->prepare("SELECT * FROM thread WHERE id_thread = ? AND username_pembuat = ?");
+        $stmt->bind_param("is", $threadId, $username);
+        $stmt->execute();
+        return $stmt->get_result()->num_rows > 0;
+    }
 }
-?>

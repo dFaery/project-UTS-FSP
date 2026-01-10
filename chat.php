@@ -21,7 +21,6 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1) {
 if (!isset($_GET['id'])) {
     echo "<script>alert('Thread tidak valid'); window.location.href='index.php';</script>";
 }
-
 $idThread = $_GET['id'];
 $username = $_SESSION['user'];
 
@@ -39,11 +38,9 @@ if (!$isMember) {
     echo "<script>alert('Akses Ditolak: Anda bukan anggota grup ini atau telah dikeluarkan.'); window.location.href='index.php';</script>";
     exit();
 }
-
-if (isset($_POST['sendMessage'])) {
-    $isi = $_POST['isi'];
-    $newChat = $chatObj->insertChat($idThread, $username, $isi);
-}
+// VALIDASI OWNER THREAD ATAU BUKAN
+$isOwner = ($thread['username_pembuat'] == $username);
+$isOpen = ($thread['status']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -111,14 +108,14 @@ if (isset($_POST['sendMessage'])) {
         }
 
         .message.incoming {
-            display: none;
+            /* display: none; */
             background: #d2d5d7ff;
             align-self: flex-start;
             border-bottom-left-radius: 4px;
         }
 
         .message.outgoing {
-            display: none;
+            /* display: none; */
             background: #3498db;
             color: #fff;
             align-self: flex-end;
@@ -147,10 +144,16 @@ if (isset($_POST['sendMessage'])) {
         }
 
         .send-message button {
+            display: none;
             border: none;
             background: #fff;
             border-radius: 5px;
             cursor: pointer;
+        }
+
+        .send-message button:hover {
+            transform: scale(1.1);
+            transition: transform 0.2s ease-in-out;
         }
 
         .header button {
@@ -174,13 +177,14 @@ if (isset($_POST['sendMessage'])) {
             width: 48px;
         }
 
-        #msg-sender {}
+        .msg-sender {}
 
-        #msg-item {
+        .msg-item {
             font-weight: 100;
         }
 
-        #msg-send-time {
+        .msg-send-time {
+            font-size: 8px;
             text-align: end;
         }
 
@@ -207,7 +211,7 @@ if (isset($_POST['sendMessage'])) {
     <div class="chat-container">
         <div class="header">
             <div class="header-left">
-                <button type="button" id="back">
+                <button type="button" name="btn-back" id="btn-back">
                     <img src="images/assets/img-arrow-back.png" alt="Send">
                 </button>
                 <h5>Chat Room</h5>
@@ -222,18 +226,116 @@ if (isset($_POST['sendMessage'])) {
         <div class="main" id="chatBox">
             <?php
             // CONTINUE LOOPING CHAT DATA HERE
+            $resChat = $chatObj->getAllChatByThreadId($idThread);
+            $lastChatId = 0;
+            if ($resChat->num_rows > 0) {
+                while ($chat = $resChat->fetch_assoc()) {
+                    $lastChatId = $chat['idchat'];
+                    if ($chat['username_pembuat'] === $username) {
+                        // use bubblechat logged in user
+                        echo "<div class='message outgoing' data-id='{$chat['idchat']}'>";
+                    } else {
+                        // use bubblechat other user
+                        echo "<div class='message incoming' data-id='{$chat['idchat']}'>";
+                    }
+                    echo "<p class='msg-sender'><b>" . $chat['username_pembuat'] . "</b></p>";
+                    echo "<p class='msg-item'>" . $chat['isi'] . "</p>";
+                    echo "<p class='msg-send-time'>" . $chat['tanggal_pembuatan'] . "</p>";
+                    echo "</div>";
+                }
+            }
             ?>
         </div>
+        <!-- Biar tahu ini chat id terakhirnya diberapa -->
+        <input type="hidden" id="lastChatId" value="<?= $lastChatId ?>">
+
 
         <div class="send-message">
             <form method="POST" class="send-form">
-                <input type="text" id="messageInput" placeholder="Type a message" name="isi">
-                <button type="submit" id="sendMessage" name="sendMessage">
+                <input type="text" id="messageInput" placeholder="Type a message" name="isi" data-thread-status="<?= $isOpen ?>" required>
+                <input type="hidden" id="idthread" value="<?= $idThread ?>">
+                <button type="button" id="sendMessage" name="sendMessage">
                     <img src="images/assets/img-send-msg.png" alt="Send">
                 </button>
             </form>
         </div>
+
     </div>
+
+    <script src="js/jquery-3.7.1.js"></script>
+    <script>
+        $(document).ready(function() {
+            setInterval(loadChat, 2000);
+
+            const threadStatus = $('#messageInput').data('thread-status');
+            if (threadStatus === 'Open') {
+                $('#messageInput').prop('disabled', true);
+                $('#messageInput').attr('placeholder', 'Hanya pembuat thread yang dapat mengirim pesan')
+                $('#sendMessage').prop('disabled', true);
+            }
+
+
+            $("#messageInput").on("input", function() {
+                var inputVal = $(this).val().trim();
+
+                if (inputVal == "") {
+                    $("#sendMessage").hide();
+                } else {
+                    $("#sendMessage").show();
+                }
+            });
+
+            $('#sendMessage').click(function() {
+
+                let isi = $('#messageInput').val().trim();
+
+                $.ajax({
+                    url: "process/ajax_insert_chat.php",
+                    type: "POST",
+                    data: {
+                        idthread: $('#idthread').val(),
+                        isi: isi
+                    },
+                    success: function(res) {
+                        $('#messageInput').val('');
+                    }
+                });
+            });
+
+            $('#btn-back').on('click', function() {                
+                window.location.href = 'detail_grup.php?id=<?= $idGrup ?>';
+            });
+
+            function loadChat() {
+                let lastChatId = $("#lastChatId").val()
+                console.log("lastChatId sebelum:", lastChatId);
+
+                $.ajax({
+                    url: "process/ajax_load_new_chat.php",
+                    type: "POST",
+                    data: {
+                        idThread: $("#idthread").val(),
+                        lastChatId: lastChatId
+                    },
+                    success: function(res) {
+                        if (res.trim() === "") return;
+
+                        $("#chatBox").append(res);
+
+                        // deklarasikan DULU
+                        let lastDiv = $("#chatBox .message").last();
+                        let newLastId = lastDiv.data("id");
+
+                        if (newLastId !== undefined) {
+                            $("#lastChatId").val(newLastId);
+                        }
+
+                        $("#chatBox").scrollTop($("#chatBox")[0].scrollHeight);
+                    }
+                })
+            }
+        })
+    </script>
 </body>
 
 </html>
