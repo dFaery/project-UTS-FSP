@@ -23,5 +23,12 @@ class Chat extends classParent
         $stmt->execute();
         $stmt->close();
     }
+
+    public function getChatAfterId($idthread, $last_id_chat){
+        $stmt = $this->mysqli->prepare("SELECT * FROM chat WHERE idthread = ? AND idchat > ? ORDER BY idchat ASC");
+        $stmt->bind_param("ii", $idthread, $last_id_chat);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
 }
 ?>
