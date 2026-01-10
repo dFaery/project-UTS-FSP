@@ -43,4 +43,10 @@ class Thread extends classParent
         $stmt->execute();
         return $stmt->get_result()->num_rows > 0;
     }
+
+    public function updateThreadStatus($threadId, $updated_status){
+        $stmt = $this->mysqli->prepare("UPDATE thread SET status=? WHERE idthread=?");
+        $stmt->bind_param("si", $updated_status, $threadId);
+        return $stmt->execute();
+    }
 }
