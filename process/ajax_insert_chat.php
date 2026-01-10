@@ -2,9 +2,9 @@
 session_start();
 require_once("../class/Chat.php");
 
-if (isset($_POST['idthread']) && isset($_POST['isi'])) {
+if (isset($_POST['idThread']) && isset($_POST['isi'])) {
 
-    $idthread = $_POST['idthread'];
+    $idthread = $_POST['idThread'];
     $isi = $_POST['isi'];
     $username = $_SESSION['user'];
 
