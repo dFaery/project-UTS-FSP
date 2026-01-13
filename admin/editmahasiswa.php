@@ -34,7 +34,6 @@ $mahasiswa = $result->fetch_assoc();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Mahasiswa</title>
     <style>
-        /* --- THEME VARIABLES --- */
         :root {
             --bg-body: #f0f2f5;
             --bg-container: #fff;
@@ -46,7 +45,6 @@ $mahasiswa = $result->fetch_assoc();
             --shadow: rgba(0,0,0,0.1);
         }
 
-        /* Dark Mode Override */
         body.dark-mode {
             --bg-body: #18191a;
             --bg-container: #242526;
@@ -121,7 +119,6 @@ $mahasiswa = $result->fetch_assoc();
         .btn-save { background-color: #f39c12; flex-grow: 1; }
         .btn-back { background-color: #7f8c8d; }
 
-        /* Toggle Button */
         .theme-toggle-btn {
             position: fixed; bottom: 20px; right: 20px;
             width: 50px; height: 50px; border-radius: 50%;
@@ -132,14 +129,7 @@ $mahasiswa = $result->fetch_assoc();
         }
         .theme-toggle-btn:hover { transform: scale(1.1); }
     </style>
-    <script>
-        (function() {
-            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
-            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
-                document.documentElement.classList.add('dark-mode');
-            }
-        })();
-    </script>
+    <script src="../js/jquery-3.7.1.js"></script>
 </head>
 <body>
     <button class="theme-toggle-btn" id="themeToggle" title="Ganti Tema">🌓</button>
@@ -190,38 +180,51 @@ $mahasiswa = $result->fetch_assoc();
     </div>
 
     <script>
-        const themeToggleBtn = document.getElementById('themeToggle');
-        const body = document.body;
-        const html = document.documentElement;
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme) {
+                const theme = savedTheme.split('=')[1];
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                }
+            }
+        })();
 
-        if (html.classList.contains('dark-mode')) {
-            body.classList.add('dark-mode');
-            html.classList.remove('dark-mode');
-            themeToggleBtn.textContent = '☀️';
-        } else {
-            themeToggleBtn.textContent = '🌙';
-        }
+        $(document).ready(function() {
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
 
-        themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                setCookie('theme', 'dark', 365);
-                themeToggleBtn.textContent = '☀️';
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                setCookie('theme', 'light', 365);
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
+            }
+
+            $themeBtn.on('click', function() {
+                $body.toggleClass('dark-mode');
+
+                if ($body.hasClass('dark-mode')) {
+                    setCookie('theme', 'dark', 365);
+                    $(this).text('☀️');
+                } else {
+                    setCookie('theme', 'light', 365);
+                    $(this).text('🌙');
+                }
+            });
+
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
             }
         });
-
-        function setCookie(name, value, days) {
-            var expires = "";
-            if (days) {
-                var date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                expires = "; expires=" + date.toUTCString();
-            }
-            document.cookie = name + "=" + (value || "") + expires + "; path=/";
-        }
     </script>
 </body>
 </html>

@@ -18,7 +18,6 @@ if(isset($_SESSION['user'])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <style>
-        /* --- THEME VARIABLES --- */
         :root {
             --bg-body: #f0f2f5;
             --bg-container: #fff;
@@ -111,8 +110,7 @@ if(isset($_SESSION['user'])){
         .btn-back {
             background-color: #7f8c8d;
         }
-
-        /* Toggle Button */
+        
         .theme-toggle-btn {
             position: fixed;
             bottom: 20px;
@@ -134,14 +132,7 @@ if(isset($_SESSION['user'])){
         }
         .theme-toggle-btn:hover { transform: scale(1.1); }
     </style>
-    <script>
-        (function() {
-            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
-            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
-                document.documentElement.classList.add('dark-mode');
-            }
-        })();
-    </script>
+    <script src="js/jquery-3.7.1.js"></script>
 </head>
 
 <body>
@@ -166,38 +157,47 @@ if(isset($_SESSION['user'])){
     </div>
 
     <script>
-        const themeToggleBtn = document.getElementById('themeToggle');
-        const body = document.body;
-        const html = document.documentElement;
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+        
+        $(document).ready(function() {
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
 
-        if (html.classList.contains('dark-mode')) {
-            body.classList.add('dark-mode');
-            html.classList.remove('dark-mode');
-            themeToggleBtn.textContent = '☀️';
-        } else {
-            themeToggleBtn.textContent = '🌙';
-        }
-
-        themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                setCookie('theme', 'dark', 365);
-                themeToggleBtn.textContent = '☀️';
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                setCookie('theme', 'light', 365);
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
+            }
+
+            $themeBtn.on('click', function() {
+                $body.toggleClass('dark-mode');
+                if ($body.hasClass('dark-mode')) {
+                    setCookie('theme', 'dark', 365);
+                    $(this).text('☀️');
+                } else {
+                    setCookie('theme', 'light', 365);
+                    $(this).text('🌙');
+                }
+            });
+
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
             }
         });
-
-        function setCookie(name, value, days) {
-            var expires = "";
-            if (days) {
-                var date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                expires = "; expires=" + date.toUTCString();
-            }
-            document.cookie = name + "=" + (value || "") + expires + "; path=/";
-        }
     </script>
 </body>
 </html>

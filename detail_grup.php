@@ -4,13 +4,11 @@ require_once("class/Grup.php");
 require_once("class/Event.php");
 require_once("class/Thread.php");
 
-// 1. Cek Login
 if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit();
 }
 
-// 2. Cek Parameter ID
 if (!isset($_GET['id'])) {
     die("ID Grup tidak ditemukan.");
 }
@@ -22,31 +20,25 @@ $grupObj = new Grup();
 $eventObj = new Event();
 $threadObj = new Thread();
 
-// 3. Ambil Data Grup
 $grup = $grupObj->getGrupById($idgrup);
 if (!$grup) die("Grup tidak ditemukan.");
 
-// --- PERMISSION VARIABLES ---
 $isPembuat = ($grup['username_pembuat'] == $username);
 $isMember = $grupObj->isMember($idgrup, $username);
 $isDosen = $grupObj->isDosen($username);
 
-// --- SECURITY CHECK ---
 if (!$isPembuat && !$isMember) {
     echo "<script>alert('Akses Ditolak: Anda bukan anggota grup ini atau telah dikeluarkan.'); window.location.href='index.php';</script>";
     exit();
 }
 
-// Hak Akses Mengelola Event
 $canManageEvent = ($isPembuat || ($isMember && $isDosen));
 
-// --- LOGIC: UPDATE INFO GRUP ---
 if ($isPembuat && isset($_POST['btnUpdateGrup'])) {
     $grupObj->updateGrup($idgrup, $_POST['nama'], $_POST['deskripsi'], $_POST['jenis']);
     echo "<script>alert('Info grup diperbarui!'); window.location.href='detail_grup.php?id=$idgrup';</script>";
 }
 
-// --- LOGIC: EVENT ---
 $eventEdit = null;
 if ($canManageEvent && isset($_GET['edit_event'])) {
     $eventEdit = $eventObj->getEventById($_GET['edit_event']);
@@ -67,7 +59,6 @@ if ($canManageEvent && isset($_GET['hapus_event'])) {
     header("Location: detail_grup.php?id=$idgrup");
 }
 
-// --- LOGIC: MEMBER ---
 if (isset($_GET['action']) && $_GET['action'] == 'leave' && !$isPembuat) {
     $grupObj->removeMember($idgrup, $username);
     echo "<script>alert('Anda keluar dari grup.'); window.location.href='index.php';</script>";
@@ -84,7 +75,6 @@ if ($isPembuat && isset($_GET['kick_user'])) {
     }
 }
 
-// --- LOGIC: THREAD ---
 if (isset($_POST['btnTambahThread'])) {
     $status = $_POST['status'];
     $threadObj->insertThreadByGroupId($username, $idgrup, $status);
@@ -370,14 +360,6 @@ if (isset($_POST['btnTambahThread'])) {
             }
         }
     </style>
-    <script>
-        (function() {
-            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
-            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
-                document.documentElement.classList.add('dark-mode');
-            }
-        })();
-    </script>
     <script src="js/jquery-3.7.1.js"></script>
 </head>
 
@@ -624,8 +606,14 @@ if (isset($_POST['btnTambahThread'])) {
             $('#modalTambahThread').fadeOut(200);
         }
 
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+
         $(document).ready(function() {
-            // Live Search Logic
             $('#keyword').keyup(function() {
                 let key = $(this).val();
                 let idgrup = <?= $idgrup ?>;
@@ -643,7 +631,6 @@ if (isset($_POST['btnTambahThread'])) {
                 }
             });
 
-            // Add Member Logic
             $(document).on('click', '.add-btn-ajax', function() {
                 let username_mhs = $(this).data('user');
                 let idgrup = <?= $idgrup ?>;
@@ -666,7 +653,6 @@ if (isset($_POST['btnTambahThread'])) {
                 }
             });
 
-            // --- DARK MODE LOGIC ---
             const themeToggleBtn = document.getElementById('themeToggle');
             const body = document.body;
             const html = document.documentElement;

@@ -76,7 +76,6 @@ class Mahasiswa extends classParent
 
     public function updateMahasiswa($nrp_asli, $nama, $gender, $tanggal_lahir, $angkatan)
     {
-        // Ambil data foto lama
         $stmt_select = $this->mysqli->prepare("SELECT foto_extention FROM mahasiswa WHERE nrp = ?");
         $stmt_select->bind_param("s", $nrp_asli);
         $stmt_select->execute();

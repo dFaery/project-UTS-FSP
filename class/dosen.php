@@ -43,7 +43,6 @@ class Dosen extends classParent
 
     public function deleteDosen($npk_to_delete)
     {
-        // delete images
         $stmt_select = $this->mysqli->prepare("SELECT foto_extension FROM dosen WHERE npk = ?");
         $stmt_select->bind_param("s", $npk_to_delete);
         $stmt_select->execute();
@@ -61,7 +60,6 @@ class Dosen extends classParent
         }
         $stmt_select->close();
 
-        //delete data dosen
         $stmt_delete = $this->mysqli->prepare("DELETE FROM dosen WHERE npk = ?");
         $stmt_delete->bind_param("s", $npk_to_delete);
 
@@ -77,7 +75,6 @@ class Dosen extends classParent
 
     public function updateDosen($npk_asli, $nama)
     {
-        // Ambil data foto lama
         $stmt_select = $this->mysqli->prepare("SELECT foto_extension FROM dosen WHERE npk = ?");
         $stmt_select->bind_param("s", $npk_asli);
         $stmt_select->execute();

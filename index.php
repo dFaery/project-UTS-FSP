@@ -49,7 +49,6 @@ if (isset($_POST['btnJoin'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <style>
-        /* --- THEME VARIABLES --- */
         :root {
             --bg-body: #f0f2f5;
             --bg-container: #fff;
@@ -64,7 +63,6 @@ if (isset($_POST['btnJoin'])) {
             --yellow-box: #fff8e1;
         }
 
-        /* Dark Mode Override */
         body.dark-mode {
             --bg-body: #18191a;
             --bg-container: #242526;
@@ -106,7 +104,6 @@ if (isset($_POST['btnJoin'])) {
             color: var(--text-main);
         }
 
-        /* --- BUTTON STYLES --- */
         .btn {
             padding: 8px 12px;
             border: none;
@@ -118,7 +115,6 @@ if (isset($_POST['btnJoin'])) {
             display: inline-block;
         }
 
-        /* Header Buttons Container */
         .header-buttons {
             display: flex;
             justify-content: flex-end;
@@ -132,7 +128,6 @@ if (isset($_POST['btnJoin'])) {
         .btn-kelola { background: #3498db; }
         .btn-view { background: #f39c12; }
 
-        /* --- FORM STYLES --- */
         .form-box {
             background: var(--form-bg);
             padding: 20px;
@@ -152,7 +147,6 @@ if (isset($_POST['btnJoin'])) {
             color: var(--input-text);
         }
 
-        /* --- TABLE STYLES --- */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -187,13 +181,11 @@ if (isset($_POST['btnJoin'])) {
             font-family: monospace;
         }
 
-        /* Override dark mode untuk kotak kuning (join grup) */
         body.dark-mode .form-box[style*="background"] {
             background: var(--yellow-box) !important;
             border-color: #665c26;
         }
 
-        /* --- TOGGLE THEME BUTTON --- */
         .theme-toggle-btn {
             position: fixed;
             bottom: 20px;
@@ -217,11 +209,9 @@ if (isset($_POST['btnJoin'])) {
             transform: scale(1.1);
         }
 
-        /* --- LAYOUT UTAMA --- */
         .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
         .flex-col { flex: 1; min-width: 300px; }
 
-        /* --- RESPONSIVE CSS --- */
         @media screen and (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 15px; width: 100%; }
@@ -243,17 +233,7 @@ if (isset($_POST['btnJoin'])) {
         }
     </style>
     
-    <script>
-        (function() {
-            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
-            if (savedTheme) {
-                const theme = savedTheme.split('=')[1];
-                if (theme === 'dark') {
-                    document.documentElement.classList.add('dark-mode');
-                }
-            }
-        })();
-    </script>
+    <script src="js/jquery-3.7.1.js"></script>
 </head>
 
 <body>
@@ -518,7 +498,6 @@ if (isset($_POST['btnJoin'])) {
         </div>
     </div>
 
-    <script src="js/jquery-3.7.1.js"></script>
     <script>
         function openJoinModal(namaGrup, namaDosen) {
             $('#modalGrupName').text(namaGrup);
@@ -538,40 +517,50 @@ if (isset($_POST['btnJoin'])) {
             }
         });
 
-        // --- DARK MODE LOGIC ---
-        const themeToggleBtn = document.getElementById('themeToggle');
-        const body = document.body;
-        const html = document.documentElement;
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme) {
+                const theme = savedTheme.split('=')[1];
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                }
+            }
+        })();
 
-        // Apply theme dari head script logic ke body agar konsisten
-        if (html.classList.contains('dark-mode')) {
-            body.classList.add('dark-mode');
-            html.classList.remove('dark-mode');
-            themeToggleBtn.textContent = '☀️';
-        } else {
-            themeToggleBtn.textContent = '🌙';
-        }
+        $(document).ready(function() {
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
 
-        themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                setCookie('theme', 'dark', 365);
-                themeToggleBtn.textContent = '☀️';
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                setCookie('theme', 'light', 365);
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
+            }
+
+            $themeBtn.on('click', function() {
+                $body.toggleClass('dark-mode');
+                if ($body.hasClass('dark-mode')) {
+                    setCookie('theme', 'dark', 365);
+                    $(this).text('☀️');
+                } else {
+                    setCookie('theme', 'light', 365);
+                    $(this).text('🌙');
+                }
+            });
+
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
             }
         });
-
-        function setCookie(name, value, days) {
-            var expires = "";
-            if (days) {
-                var date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                expires = "; expires=" + date.toUTCString();
-            }
-            document.cookie = name + "=" + (value || "") + expires + "; path=/";
-        }
     </script>
 
 </body>

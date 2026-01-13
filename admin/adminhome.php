@@ -126,6 +126,7 @@ else{
             transform: scale(1.1);
         }
     </style>
+    
     <script>
         (function() {
             const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
@@ -134,6 +135,7 @@ else{
             }
         })();
     </script>
+    <script src="../js/jquery-3.7.1.js"></script>
 </head>
 <body>
     
@@ -150,40 +152,58 @@ else{
     </div>
 
     <script>
-        const themeToggleBtn = document.getElementById('themeToggle');
-        const body = document.body;
-        const html = document.documentElement;
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme) {
+                const theme = savedTheme.split('=')[1];
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                }
+            }
+        })();
 
-        // Apply theme from head script logic to body
-        if (html.classList.contains('dark-mode')) {
-            body.classList.add('dark-mode');
-            html.classList.remove('dark-mode');
-            themeToggleBtn.textContent = '☀️';
-        } else {
-            themeToggleBtn.textContent = '🌙';
-        }
+        $(document).ready(function() {
+            // Cache selectors
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
 
-        themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                setCookie('theme', 'dark', 365);
-                themeToggleBtn.textContent = '☀️';
+            // 1. Cek Initial State (Sinkronisasi dengan script head)
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                setCookie('theme', 'light', 365);
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
+            }
+
+            // 2. Event Listener Click
+            $themeBtn.on('click', function() {
+                // Toggle class
+                $body.toggleClass('dark-mode');
+
+                // Cek kondisi dan set cookie
+                if ($body.hasClass('dark-mode')) {
+                    setCookie('theme', 'dark', 365);
+                    $(this).text('☀️');
+                } else {
+                    setCookie('theme', 'light', 365);
+                    $(this).text('🌙');
+                }
+            });
+
+            // 3. Fungsi Helper Cookie
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                // Path=/ agar terbaca di semua folder
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
             }
         });
-
-        function setCookie(name, value, days) {
-            var expires = "";
-            if (days) {
-                var date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                expires = "; expires=" + date.toUTCString();
-            }
-            // Path=/ memastikan cookie terbaca di semua folder
-            document.cookie = name + "=" + (value || "") + expires + "; path=/";
-        }
     </script>
 </body>
 </html>

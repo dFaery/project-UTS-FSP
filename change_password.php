@@ -18,7 +18,6 @@ if (!isset($_SESSION['user'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Change Password</title>
     <style>
-        /* --- THEME VARIABLES --- */
         :root {
             --bg-body: #f0f2f5;
             --bg-container: #fff;
@@ -103,7 +102,6 @@ if (!isset($_SESSION['user'])) {
             width: 100%;
         }
 
-        /* Toggle Button */
         .theme-toggle-btn {
             position: fixed;
             bottom: 20px;
@@ -125,14 +123,7 @@ if (!isset($_SESSION['user'])) {
         }
         .theme-toggle-btn:hover { transform: scale(1.1); }
     </style>
-    <script>
-        (function() {
-            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
-            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
-                document.documentElement.classList.add('dark-mode');
-            }
-        })();
-    </script>
+    <script src="js/jquery-3.7.1.js"></script>
 </head>
 
 <body>
@@ -163,8 +154,15 @@ if (!isset($_SESSION['user'])) {
             <button type="submit" name="change_password" class="change_password" disabled>Change Password</button>
         </form>
     </div>
-    <script src="js/jquery-3.7.1.js"></script>
+
     <script>
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+        
         $(document).ready(function() {
             $('#password, #re_enter_password').keyup(function() {
                 $('.form-group-warning-msg').empty();
@@ -190,8 +188,7 @@ if (!isset($_SESSION['user'])) {
                     alert('Password dan konfirmasi tidak sama!');
                 }
             });
-
-            // Dark Mode Logic
+            
             const themeToggleBtn = document.getElementById('themeToggle');
             const body = document.body;
             const html = document.documentElement;

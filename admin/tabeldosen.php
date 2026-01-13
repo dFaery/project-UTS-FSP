@@ -35,7 +35,6 @@ $PER_PAGE = 5;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tabel Dosen</title>
     <style>
-        /* --- THEME VARIABLES --- */
         :root {
             --bg-body: #f0f2f5;
             --bg-container: #fff;
@@ -50,7 +49,6 @@ $PER_PAGE = 5;
             --table-row-hover: #e9ecef;
         }
 
-        /* Dark Mode Override */
         body.dark-mode {
             --bg-body: #18191a;
             --bg-container: #242526;
@@ -92,7 +90,6 @@ $PER_PAGE = 5;
             margin-bottom: 20px;
         }
 
-        /* --- TABLE STYLES --- */
         .table {
             width: 100%;
             border-collapse: collapse;
@@ -121,7 +118,6 @@ $PER_PAGE = 5;
             background-color: var(--table-row-hover);
         }
 
-        /* --- BUTTON STYLES --- */
         .aksi-btn {
             padding: 8px 12px;
             border-radius: 5px;
@@ -170,7 +166,6 @@ $PER_PAGE = 5;
             text-align: center;
         }
 
-        /* --- LAYOUT UTAMA --- */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -203,7 +198,6 @@ $PER_PAGE = 5;
             cursor: pointer;
         }
 
-        /* --- PAGINATION --- */
         .pagination {
             display: flex;
             justify-content: center;
@@ -253,7 +247,6 @@ $PER_PAGE = 5;
             cursor: not-allowed;
         }
 
-        /* Toggle Button Style */
         .theme-toggle-btn {
             position: fixed;
             bottom: 20px;
@@ -277,7 +270,6 @@ $PER_PAGE = 5;
             transform: scale(1.1);
         }
 
-        /* --- RESPONSIVE MEDIA QUERY (SMARTPHONE) --- */
         @media screen and (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 15px; width: 100%; }
@@ -301,14 +293,7 @@ $PER_PAGE = 5;
             .btn-page, .btn-next, .btn-previous, .btn-next-disabled, .btn-previous-disabled { padding: 6px 10px; font-size: 14px; }
         }
     </style>
-    <script>
-        (function() {
-            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
-            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
-                document.documentElement.classList.add('dark-mode');
-            }
-        })();
-    </script>
+    <script src="../js/jquery-3.7.1.js"></script>
 </head>
 
 <body>
@@ -408,16 +393,23 @@ $PER_PAGE = 5;
             ?>
         </div>
     </div>
-    
-    <script src="../js/jquery-3.7.1.js"></script>
-    
+        
     <script>
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme) {
+                const theme = savedTheme.split('=')[1];
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark-mode');
+                }
+            }
+        })();
+
+
         $(document).ready(function() {
-            // Contoh disable tombol Previous
             $('.btn-previous-disabled').removeAttr('href');
             $('.btn-next-disabled').removeAttr('href');
 
-            // --- DARK MODE LOGIC ---
             const themeToggleBtn = document.getElementById('themeToggle');
             const body = document.body;
             const html = document.documentElement;

@@ -26,7 +26,6 @@ class Event extends classParent
         return $stmt->get_result()->fetch_assoc();
     }
 
-    // 2. Update Event
     public function updateEvent($idevent, $judul, $tanggal, $ket) {
         $slug = strtolower(str_replace(' ', '-', $judul));
         $stmt = $this->mysqli->prepare("UPDATE event SET judul=?, `judul-slug`=?, tanggal=?, keterangan=? WHERE idevent=?");
@@ -34,7 +33,6 @@ class Event extends classParent
         return $stmt->execute();
     }
 
-    // 3. Delete Event
     public function deleteEvent($idevent) {
         $stmt = $this->mysqli->prepare("DELETE FROM event WHERE idevent = ?");
         $stmt->bind_param("i", $idevent);

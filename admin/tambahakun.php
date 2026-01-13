@@ -77,7 +77,6 @@ if (isset($_POST['submit-dosen'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buat Akun</title>
     <style>
-        /* --- THEME VARIABLES --- */
         :root {
             --bg-body: #f0f2f5;
             --bg-container: #fff;
@@ -89,7 +88,6 @@ if (isset($_POST['submit-dosen'])) {
             --shadow: rgba(0,0,0,0.1);
         }
 
-        /* Dark Mode Override */
         body.dark-mode {
             --bg-body: #18191a;
             --bg-container: #242526;
@@ -168,7 +166,6 @@ if (isset($_POST['submit-dosen'])) {
             background-color: #7f8c8d;
         }
 
-        /* Toggle Button */
         .theme-toggle-btn {
             position: fixed;
             bottom: 20px;
@@ -190,14 +187,7 @@ if (isset($_POST['submit-dosen'])) {
         }
         .theme-toggle-btn:hover { transform: scale(1.1); }
     </style>
-    <script>
-        (function() {
-            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
-            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
-                document.documentElement.classList.add('dark-mode');
-            }
-        })();
-    </script>
+    <script src="../js/jquery-3.7.1.js"></script>
 </head>
 
 <body>
@@ -257,38 +247,50 @@ if (isset($_POST['submit-dosen'])) {
     </div>
 
     <script>
-        const themeToggleBtn = document.getElementById('themeToggle');
-        const body = document.body;
-        const html = document.documentElement;
+        (function() {
+            const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
+            if (savedTheme && savedTheme.split('=')[1] === 'dark') {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
 
-        if (html.classList.contains('dark-mode')) {
-            body.classList.add('dark-mode');
-            html.classList.remove('dark-mode');
-            themeToggleBtn.textContent = '☀️';
-        } else {
-            themeToggleBtn.textContent = '🌙';
-        }
+        $(document).ready(function() {
+            $('.btn-previous-disabled').removeAttr('href');
+            $('.btn-next-disabled').removeAttr('href');
 
-        themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            if (body.classList.contains('dark-mode')) {
-                setCookie('theme', 'dark', 365);
+            const themeToggleBtn = document.getElementById('themeToggle');
+            const body = document.body;
+            const html = document.documentElement;
+
+            if (html.classList.contains('dark-mode')) {
+                body.classList.add('dark-mode');
+                html.classList.remove('dark-mode');
                 themeToggleBtn.textContent = '☀️';
             } else {
-                setCookie('theme', 'light', 365);
                 themeToggleBtn.textContent = '🌙';
             }
-        });
 
-        function setCookie(name, value, days) {
-            var expires = "";
-            if (days) {
-                var date = new Date();
-                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-                expires = "; expires=" + date.toUTCString();
+            themeToggleBtn.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    setCookie('theme', 'dark', 365);
+                    themeToggleBtn.textContent = '☀️';
+                } else {
+                    setCookie('theme', 'light', 365);
+                    themeToggleBtn.textContent = '🌙';
+                }
+            });
+
+            function setCookie(name, value, days) {
+                var expires = "";
+                if (days) {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + (value || "") + expires + "; path=/";
             }
-            document.cookie = name + "=" + (value || "") + expires + "; path=/";
-        }
+        });
     </script>
 </body>
 
