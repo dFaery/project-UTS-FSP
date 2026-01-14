@@ -1,19 +1,18 @@
 <?php
 session_start();
-if(isset($_SESSION['user'])){
+if (isset($_SESSION['user'])) {
     $username = $_SESSION['user'];
     $isadmin = $_SESSION['is_admin'];
-    if($isadmin != 1){
+    if ($isadmin != 1) {
         header("Location: ../login.php");
     }
-}
-else{
+} else {
     header("Location: ../login.php");
 }
 
-if(isset($_GET['mstatus'])){
-    if($_GET['mstatus'] == 'success') echo "<script>alert('Berhasil menambahkan akun Mahasiswa');</script>";
-    if($_GET['mstatus'] == 'fail') echo "<script>alert('Gagal menambahkan akun Mahasiswa, NRP sudah terdaftar');</script>";
+if (isset($_GET['mstatus'])) {
+    if ($_GET['mstatus'] == 'success') echo "<script>alert('Berhasil menambahkan akun Mahasiswa');</script>";
+    if ($_GET['mstatus'] == 'fail') echo "<script>alert('Gagal menambahkan akun Mahasiswa, NRP sudah terdaftar');</script>";
 }
 
 require_once("../class/mahasiswa.php");
@@ -235,16 +234,19 @@ $PER_PAGE = 5;
             border-radius: 4px;
         }
 
-        .btn-next, .btn-previous {
+        .btn-next,
+        .btn-previous {
             color: var(--text-secondary);
             transition: color 0.3s ease;
         }
 
-        .btn-next:hover, .btn-previous:hover {
+        .btn-next:hover,
+        .btn-previous:hover {
             color: #3498db;
         }
 
-        .btn-next-disabled, .btn-previous-disabled {
+        .btn-next-disabled,
+        .btn-previous-disabled {
             color: #aaa;
             cursor: not-allowed;
         }
@@ -260,7 +262,7 @@ $PER_PAGE = 5;
             color: var(--bg-container);
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             font-size: 24px;
             display: flex;
             align-items: center;
@@ -268,20 +270,61 @@ $PER_PAGE = 5;
             z-index: 1000;
             transition: transform 0.2s;
         }
+
         .theme-toggle-btn:hover {
             transform: scale(1.1);
         }
 
         @media screen and (max-width: 768px) {
-            body { padding: 10px; }
-            .container { padding: 15px; width: 100%; }
-            .top-bar { flex-direction: column; align-items: stretch; }
-            .form-group { width: 100%; }
-            .btn-group { display: flex; flex-direction: column; gap: 5px; }
-            .btn-add, .btn-back { width: 100%; margin-bottom: 5px; }
-            table { display: block; overflow-x: auto; white-space: nowrap; }
-            .photo-thumbnail { width: 50px; height: 50px; }
-            .btn-page, .btn-next, .btn-previous, .btn-next-disabled, .btn-previous-disabled { padding: 6px 10px; font-size: 14px; }
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn-add,
+            .btn-back {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .photo-thumbnail {
+                width: 50px;
+                height: 50px;
+            }
+
+            .btn-page,
+            .btn-next,
+            .btn-previous,
+            .btn-next-disabled,
+            .btn-previous-disabled {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
         }
     </style>
     <script src="../js/jquery-3.7.1.js"></script>
@@ -310,7 +353,7 @@ $PER_PAGE = 5;
         $cari = isset($_GET['cari']) ? $_GET['cari'] : "";
         $cari_persen = "%" . $cari . "%";
         ?>
-        
+
         <table class="table">
             <thead>
                 <tr>
@@ -353,7 +396,7 @@ $PER_PAGE = 5;
                         echo "<td>" . htmlspecialchars($tgllahir) . "</td>";
                         echo "<td>" . htmlspecialchars($angkatan) . "</td>";
                         echo "<td>";
-                        echo "<a href='editmahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn edit-btn'>Edit</a> "; 
+                        echo "<a href='editmahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn edit-btn'>Edit</a> ";
                         echo "<a href='../process/proses_hapus_mahasiswa.php?nrp=" . htmlspecialchars($nrp) . "' class='aksi-btn delete-btn' onclick=\"return confirm('Apakah Anda yakin ingin menghapus data ini?');\">Hapus</a>";
                         echo "</td>";
                         echo "</tr>";
@@ -396,7 +439,7 @@ $PER_PAGE = 5;
             ?>
         </div>
     </div>
-    
+
     <script>
         (function() {
             const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
@@ -409,26 +452,27 @@ $PER_PAGE = 5;
             $('.btn-previous-disabled').removeAttr('href');
             $('.btn-next-disabled').removeAttr('href');
 
-            const themeToggleBtn = document.getElementById('themeToggle');
-            const body = document.body;
-            const html = document.documentElement;
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
 
-            if (html.classList.contains('dark-mode')) {
-                body.classList.add('dark-mode');
-                html.classList.remove('dark-mode');
-                themeToggleBtn.textContent = '☀️';
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
             }
 
-            themeToggleBtn.addEventListener('click', () => {
-                body.classList.toggle('dark-mode');
-                if (body.classList.contains('dark-mode')) {
+            $themeBtn.on('click', function() {
+                $body.toggleClass('dark-mode');
+
+                if ($body.hasClass('dark-mode')) {
                     setCookie('theme', 'dark', 365);
-                    themeToggleBtn.textContent = '☀️';
+                    $(this).text('☀️');
                 } else {
                     setCookie('theme', 'light', 365);
-                    themeToggleBtn.textContent = '🌙';
+                    $(this).text('🌙');
                 }
             });
 

@@ -85,7 +85,7 @@ if (isset($_POST['submit-dosen'])) {
             --input-bg: #fff;
             --input-text: #000;
             --border-color: #ccc;
-            --shadow: rgba(0,0,0,0.1);
+            --shadow: rgba(0, 0, 0, 0.1);
         }
 
         body.dark-mode {
@@ -96,7 +96,7 @@ if (isset($_POST['submit-dosen'])) {
             --input-bg: #3a3b3c;
             --input-text: #e4e6eb;
             --border-color: #555;
-            --shadow: rgba(255,255,255,0.1);
+            --shadow: rgba(255, 255, 255, 0.1);
         }
 
         body {
@@ -177,7 +177,7 @@ if (isset($_POST['submit-dosen'])) {
             color: var(--bg-container);
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             font-size: 24px;
             display: flex;
             align-items: center;
@@ -185,7 +185,10 @@ if (isset($_POST['submit-dosen'])) {
             z-index: 1000;
             transition: transform 0.2s;
         }
-        .theme-toggle-btn:hover { transform: scale(1.1); }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
+        }
     </style>
     <script src="../js/jquery-3.7.1.js"></script>
 </head>
@@ -208,7 +211,11 @@ if (isset($_POST['submit-dosen'])) {
 
             <div class="form-group">
                 <label for="npk">NPK / NRP</label>
-                <input type="text" id="npk" name="<?php if (isset($npk)) { echo 'npk'; } else if (isset($nrp)) { echo 'nrp'; } ?>"
+                <input type="text" id="npk" name="<?php if (isset($npk)) {
+                                                        echo 'npk';
+                                                    } else if (isset($nrp)) {
+                                                        echo 'nrp';
+                                                    } ?>"
                     value="<?php echo htmlspecialchars($id); ?>" readonly>
             </div>
 
@@ -258,26 +265,27 @@ if (isset($_POST['submit-dosen'])) {
             $('.btn-previous-disabled').removeAttr('href');
             $('.btn-next-disabled').removeAttr('href');
 
-            const themeToggleBtn = document.getElementById('themeToggle');
-            const body = document.body;
-            const html = document.documentElement;
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
 
-            if (html.classList.contains('dark-mode')) {
-                body.classList.add('dark-mode');
-                html.classList.remove('dark-mode');
-                themeToggleBtn.textContent = '☀️';
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
             }
 
-            themeToggleBtn.addEventListener('click', () => {
-                body.classList.toggle('dark-mode');
-                if (body.classList.contains('dark-mode')) {
+            $themeBtn.on('click', function() {
+                $body.toggleClass('dark-mode');
+
+                if ($body.hasClass('dark-mode')) {
                     setCookie('theme', 'dark', 365);
-                    themeToggleBtn.textContent = '☀️';
+                    $(this).text('☀️');
                 } else {
                     setCookie('theme', 'light', 365);
-                    themeToggleBtn.textContent = '🌙';
+                    $(this).text('🌙');
                 }
             });
 

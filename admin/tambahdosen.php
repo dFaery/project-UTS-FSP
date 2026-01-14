@@ -1,18 +1,18 @@
 <?php
 session_start();
-if(isset($_SESSION['user'])){
+if (isset($_SESSION['user'])) {
     $username = $_SESSION['user'];
     $isadmin = $_SESSION['is_admin'];
-    if($isadmin != 1){
+    if ($isadmin != 1) {
         header("Location: ../login.php");
     }
-}
-else{
+} else {
     header("Location: ../login.php");
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +26,7 @@ else{
             --input-bg: #fff;
             --input-text: #000;
             --border-color: #ccc;
-            --shadow: rgba(0,0,0,0.1);
+            --shadow: rgba(0, 0, 0, 0.1);
         }
 
         body.dark-mode {
@@ -37,77 +37,103 @@ else{
             --input-bg: #3a3b3c;
             --input-text: #e4e6eb;
             --border-color: #555;
-            --shadow: rgba(255,255,255,0.1);
+            --shadow: rgba(255, 255, 255, 0.1);
         }
 
-        body { 
-            font-family: sans-serif; 
-            background-color: var(--bg-body); 
-            padding: 20px; 
+        body {
+            font-family: sans-serif;
+            background-color: var(--bg-body);
+            padding: 20px;
             transition: background 0.3s;
             color: var(--text-label);
         }
 
-        .container { 
-            max-width: 500px; 
-            margin: auto; 
-            background-color: var(--bg-container); 
-            padding: 30px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 15px var(--shadow); 
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background-color: var(--bg-container);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px var(--shadow);
         }
 
-        h1 { 
-            text-align: center; 
-            color: var(--text-main); 
+        h1 {
+            text-align: center;
+            color: var(--text-main);
         }
 
-        .form-group { margin-bottom: 20px; }
-        
-        .form-group label { 
-            display: block; 
-            margin-bottom: 5px; 
-            font-weight: bold; 
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
             color: var(--text-label);
         }
 
-        .form-group input { 
-            width: 100%; 
-            padding: 10px; 
-            border: 1px solid var(--border-color); 
-            border-radius: 5px; 
-            box-sizing: border-box; 
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-sizing: border-box;
             background-color: var(--input-bg);
             color: var(--input-text);
         }
 
-        .btn-group { display: flex; gap: 10px; }
-        
-        .btn { 
-            padding: 10px 15px; 
-            border: none; 
-            border-radius: 5px; 
-            text-decoration: none; 
-            color: white; 
-            cursor: pointer; 
-            text-align: center; 
+        .btn-group {
+            display: flex;
+            gap: 10px;
         }
 
-        .btn-save { background-color: #2ecc71; flex-grow: 1; }
-        .btn-back { background-color: #7f8c8d; }
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-save {
+            background-color: #2ecc71;
+            flex-grow: 1;
+        }
+
+        .btn-back {
+            background-color: #7f8c8d;
+        }
 
         .theme-toggle-btn {
-            position: fixed; bottom: 20px; right: 20px;
-            width: 50px; height: 50px; border-radius: 50%;
-            background-color: var(--text-main); color: var(--bg-container);
-            border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            font-size: 24px; display: flex; align-items: center; justify-content: center;
-            z-index: 1000; transition: transform 0.2s;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--text-main);
+            color: var(--bg-container);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: transform 0.2s;
         }
-        .theme-toggle-btn:hover { transform: scale(1.1); }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
+        }
     </style>
     <script src="../js/jquery-3.7.1.js"></script>
 </head>
+
 <body>
     <button class="theme-toggle-btn" id="themeToggle" title="Ganti Tema">🌓</button>
 
@@ -129,7 +155,7 @@ else{
             <div class="btn-group">
                 <a href="tabeldosen.php" class="btn btn-back">Batal</a>
                 <button type="submit" class="btn btn-save" name="submit-dosen">Simpan Data</button>
-            </div>            
+            </div>
         </form>
     </div>
 
@@ -145,26 +171,27 @@ else{
             $('.btn-previous-disabled').removeAttr('href');
             $('.btn-next-disabled').removeAttr('href');
 
-            const themeToggleBtn = document.getElementById('themeToggle');
-            const body = document.body;
-            const html = document.documentElement;
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
 
-            if (html.classList.contains('dark-mode')) {
-                body.classList.add('dark-mode');
-                html.classList.remove('dark-mode');
-                themeToggleBtn.textContent = '☀️';
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
             }
 
-            themeToggleBtn.addEventListener('click', () => {
-                body.classList.toggle('dark-mode');
-                if (body.classList.contains('dark-mode')) {
+            $themeBtn.on('click', function() {
+                $body.toggleClass('dark-mode');
+
+                if ($body.hasClass('dark-mode')) {
                     setCookie('theme', 'dark', 365);
-                    themeToggleBtn.textContent = '☀️';
+                    $(this).text('☀️');
                 } else {
                     setCookie('theme', 'light', 365);
-                    themeToggleBtn.textContent = '🌙';
+                    $(this).text('🌙');
                 }
             });
 
@@ -180,4 +207,5 @@ else{
         });
     </script>
 </body>
+
 </html>

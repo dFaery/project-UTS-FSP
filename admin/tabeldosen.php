@@ -1,20 +1,19 @@
 <?php
 session_start();
-if(isset($_SESSION['user'])){
+if (isset($_SESSION['user'])) {
     $username = $_SESSION['user'];
     $isadmin = $_SESSION['is_admin'];
-    if($isadmin != 1){
+    if ($isadmin != 1) {
         header("Location: ../login.php");
     }
-}
-else{
+} else {
     header("Location: ../login.php");
 }
 require_once("../class/dosen.php");
 
-if(isset($_GET['dstatus'])){
-    if($_GET['dstatus'] == 'success') echo "<script>alert('Berhasil menambahkan akun Dosen');</script>";
-    if($_GET['dstatus'] == 'fail') echo "<script>alert('Gagal menambahkan akun Dosen, NPK sudah terdaftar');</script>";
+if (isset($_GET['dstatus'])) {
+    if ($_GET['dstatus'] == 'success') echo "<script>alert('Berhasil menambahkan akun Dosen');</script>";
+    if ($_GET['dstatus'] == 'fail') echo "<script>alert('Gagal menambahkan akun Dosen, NPK sudah terdaftar');</script>";
 }
 
 $mysqli = new mysqli("localhost", "root", "", "fullstack");
@@ -233,16 +232,19 @@ $PER_PAGE = 5;
             border-radius: 4px;
         }
 
-        .btn-next, .btn-previous {
+        .btn-next,
+        .btn-previous {
             color: var(--text-secondary);
             transition: color 0.3s ease;
         }
 
-        .btn-next:hover, .btn-previous:hover {
+        .btn-next:hover,
+        .btn-previous:hover {
             color: #3498db;
         }
 
-        .btn-next-disabled, .btn-previous-disabled {
+        .btn-next-disabled,
+        .btn-previous-disabled {
             color: #aaa;
             cursor: not-allowed;
         }
@@ -258,7 +260,7 @@ $PER_PAGE = 5;
             color: var(--bg-container);
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             font-size: 24px;
             display: flex;
             align-items: center;
@@ -266,31 +268,68 @@ $PER_PAGE = 5;
             z-index: 1000;
             transition: transform 0.2s;
         }
+
         .theme-toggle-btn:hover {
             transform: scale(1.1);
         }
 
         @media screen and (max-width: 768px) {
-            body { padding: 10px; }
-            .container { padding: 15px; width: 100%; }
-            .top-bar { flex-direction: column; align-items: stretch; }
-            .form-group { width: 100%; }
-            .btn-group { display: flex; flex-direction: column; gap: 5px; }
-            .btn-add, .btn-back { width: 100%; margin-bottom: 5px; }
-
-            table { 
-                width: 100%;
-                display: table; 
+            body {
+                padding: 10px;
             }
-            
-            th, td {
+
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+
+            .top-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-group {
+                width: 100%;
+            }
+
+            .btn-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .btn-add,
+            .btn-back {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+
+            table {
+                width: 100%;
+                display: table;
+            }
+
+            th,
+            td {
                 white-space: normal;
                 font-size: 14px;
-                padding: 8px 5px; 
+                padding: 8px 5px;
             }
-            
-            .photo-thumbnail { width: 40px; height: 40px; } /* Perkecil foto di HP */
-            .btn-page, .btn-next, .btn-previous, .btn-next-disabled, .btn-previous-disabled { padding: 6px 10px; font-size: 14px; }
+
+            .photo-thumbnail {
+                width: 40px;
+                height: 40px;
+            }
+
+            /* Perkecil foto di HP */
+            .btn-page,
+            .btn-next,
+            .btn-previous,
+            .btn-next-disabled,
+            .btn-previous-disabled {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
         }
     </style>
     <script src="../js/jquery-3.7.1.js"></script>
@@ -393,7 +432,7 @@ $PER_PAGE = 5;
             ?>
         </div>
     </div>
-        
+
     <script>
         (function() {
             const savedTheme = document.cookie.split('; ').find(row => row.startsWith('theme='));
@@ -410,26 +449,27 @@ $PER_PAGE = 5;
             $('.btn-previous-disabled').removeAttr('href');
             $('.btn-next-disabled').removeAttr('href');
 
-            const themeToggleBtn = document.getElementById('themeToggle');
-            const body = document.body;
-            const html = document.documentElement;
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
 
-            if (html.classList.contains('dark-mode')) {
-                body.classList.add('dark-mode');
-                html.classList.remove('dark-mode');
-                themeToggleBtn.textContent = '☀️';
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
             }
 
-            themeToggleBtn.addEventListener('click', () => {
-                body.classList.toggle('dark-mode');
-                if (body.classList.contains('dark-mode')) {
+            $themeBtn.on('click', function() {
+                $body.toggleClass('dark-mode');
+
+                if ($body.hasClass('dark-mode')) {
                     setCookie('theme', 'dark', 365);
-                    themeToggleBtn.textContent = '☀️';
+                    $(this).text('☀️');
                 } else {
                     setCookie('theme', 'light', 365);
-                    themeToggleBtn.textContent = '🌙';
+                    $(this).text('🌙');
                 }
             });
 

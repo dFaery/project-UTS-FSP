@@ -88,8 +88,7 @@ if (isset($_POST['btnTambahThread'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail: <?= htmlspecialchars($grup['nama']) ?></title>
-    <style>
-        /* --- THEME VARIABLES --- */
+    <style>        
         :root {
             --bg-body: #f0f2f5;
             --bg-container: #fff;
@@ -147,11 +146,13 @@ if (isset($_POST['btnTambahThread'])) {
             transition: background 0.3s;
         }
 
-        h1, h3, h4, p {
+        h1,
+        h3,
+        h4,
+        p {
             color: var(--text-main);
         }
-
-        /* --- LAYOUT UTAMA: VERTIKAL STACK --- */
+        
         .row {
             display: flex;
             flex-direction: column;
@@ -167,7 +168,6 @@ if (isset($_POST['btnTambahThread'])) {
             border: 1px solid var(--col-border);
         }
 
-        /* BUTTONS */
         .btn {
             padding: 8px 12px;
             border-radius: 4px;
@@ -179,14 +179,31 @@ if (isset($_POST['btnTambahThread'])) {
             font-size: 14px;
         }
 
-        .btn-back { background: #7f8c8d; }
-        .btn-save { background: #2ecc71; }
-        .btn-kick { background: #e74c3c; font-size: 0.8em; }
-        .btn-leave { background: #c0392b; float: right; }
-        .btn-kelola { background:#f39c12; }
+        .btn-back {
+            background: #7f8c8d;
+        }
 
-        /* FORMS */
-        input, select, textarea {
+        .btn-save {
+            background: #2ecc71;
+        }
+
+        .btn-kick {
+            background: #e74c3c;
+            font-size: 0.8em;
+        }
+
+        .btn-leave {
+            background: #c0392b;
+            float: right;
+        }
+
+        .btn-kelola {
+            background: #f39c12;
+        }
+
+        input,
+        select,
+        textarea {
             width: 100%;
             padding: 8px;
             margin-bottom: 10px;
@@ -196,10 +213,9 @@ if (isset($_POST['btnTambahThread'])) {
             color: var(--input-text);
         }
 
-        /* TABLES */
         .table-responsive {
             width: 100%;
-            overflow-x: auto; 
+            overflow-x: auto;
         }
 
         table {
@@ -209,7 +225,8 @@ if (isset($_POST['btnTambahThread'])) {
             min-width: 600px;
         }
 
-        th, td {
+        th,
+        td {
             padding: 10px;
             border-bottom: 1px solid var(--table-border);
             text-align: left;
@@ -220,8 +237,7 @@ if (isset($_POST['btnTambahThread'])) {
             background: #3498db;
             color: var(--table-head-text);
         }
-
-        /* HEADER GRUP */
+       
         .edit-box {
             background: var(--yellow-box);
             padding: 15px;
@@ -229,23 +245,22 @@ if (isset($_POST['btnTambahThread'])) {
             border-radius: 5px;
             margin-bottom: 20px;
         }
-        
+
         .form-header-grup {
             display: flex;
             gap: 10px;
             align-items: flex-end;
             flex-wrap: wrap;
         }
-        
-        .form-header-grup > div {
+
+        .form-header-grup>div {
             flex: 1;
             min-width: 200px;
         }
-
-        /* SEARCH CONTAINER */
+        
         .search-container {
             position: relative;
-            background: var(--col-bg); /* Mengikuti tema kolom */
+            background: var(--col-bg);            
             padding: 15px;
             border-radius: 8px;
             margin-bottom: 20px;
@@ -274,7 +289,10 @@ if (isset($_POST['btnTambahThread'])) {
             align-items: center;
             color: var(--text-secondary);
         }
-        .search-item:hover { background-color: var(--col-bg); }
+
+        .search-item:hover {
+            background-color: var(--col-bg);
+        }
 
         .tambah-percakapan {
             display: flex;
@@ -282,32 +300,34 @@ if (isset($_POST['btnTambahThread'])) {
             align-items: center;
             margin-bottom: 10px;
         }
-
-        /* MODAL */
-        .modal-bg {
-            display:none; 
-            position:fixed; top:0; left:0; 
-            width:100%; height:100%; 
-            background:rgba(0,0,0,0.5); 
-            z-index:999;
-        }
         
+        .modal-bg {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
         .modal-content {
             background: var(--modal-bg);
-            width:90%; max-width:400px; 
-            margin:100px auto; padding:20px; 
-            border-radius:8px; 
-            box-shadow:0 4px 10px rgba(0,0,0,0.2); 
-            position:relative;
+            width: 90%;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
             color: var(--text-main);
         }
-
-        /* Overrides inside modal for inputs */
+        
         .modal-content input[readonly] {
             background-color: var(--col-bg) !important;
         }
-
-        /* Toggle Button */
+        
         .theme-toggle-btn {
             position: fixed;
             bottom: 20px;
@@ -319,7 +339,7 @@ if (isset($_POST['btnTambahThread'])) {
             color: var(--bg-container);
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             font-size: 24px;
             display: flex;
             align-items: center;
@@ -327,31 +347,43 @@ if (isset($_POST['btnTambahThread'])) {
             z-index: 1000;
             transition: transform 0.2s;
         }
-        .theme-toggle-btn:hover { transform: scale(1.1); }
 
-        /* --- MEDIA QUERY SMARTPHONE --- */
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
+        }
+
         @media screen and (max-width: 768px) {
-            body { padding: 10px; }
-            .container { padding: 15px; }
+            body {
+                padding: 10px;
+            }
 
-            .btn-leave, .btn-back {
+            .container {
+                padding: 15px;
+            }
+
+            .btn-leave,
+            .btn-back {
                 float: none;
                 display: block;
                 width: 100%;
                 text-align: center;
                 margin-top: 10px;
             }
-            .btn-back { margin-top: 0; }
+
+            .btn-back {
+                margin-top: 0;
+            }
 
             .form-header-grup {
                 flex-direction: column;
                 align-items: stretch;
             }
+
             .form-header-grup button {
                 width: 100%;
                 margin-top: 5px;
             }
-            
+
             #search-result {
                 position: relative;
                 width: 100%;
@@ -403,7 +435,7 @@ if (isset($_POST['btnTambahThread'])) {
         <?php endif; ?>
 
         <div class="row">
-            
+
             <div class="col">
                 <h3>Agenda / Event</h3>
 
@@ -521,7 +553,7 @@ if (isset($_POST['btnTambahThread'])) {
                     <h3>Percakapan</h3>
                     <button class="btn btn-save" style="height: 35px;" onclick="openTambahThreadModal()">+ Tambah</button>
                 </div>
-                
+
                 <div class="table-responsive">
                     <table>
                         <thead>
@@ -551,8 +583,8 @@ if (isset($_POST['btnTambahThread'])) {
                 </div>
             </div>
 
-        </div> 
-        
+        </div>
+
         <div id="modalTambahThread" class="modal-bg">
             <div class="modal-content">
 
@@ -595,8 +627,8 @@ if (isset($_POST['btnTambahThread'])) {
             </div>
         </div>
 
-    </div> 
-    
+    </div>
+
     <script>
         function openTambahThreadModal() {
             $('#modalTambahThread').fadeIn(200);
@@ -621,7 +653,10 @@ if (isset($_POST['btnTambahThread'])) {
                     $.ajax({
                         url: 'process/ajax_search.php',
                         method: 'POST',
-                        data: { keyword: key, idgrup: idgrup },
+                        data: {
+                            keyword: key,
+                            idgrup: idgrup
+                        },
                         success: function(data) {
                             $('#search-result').html(data).slideDown(200);
                         }
@@ -636,7 +671,10 @@ if (isset($_POST['btnTambahThread'])) {
                 let idgrup = <?= $idgrup ?>;
                 let tombol = $(this);
                 tombol.text('...').prop('disabled', true);
-                $.post('process/ajax_add_member.php', { username: username_mhs, idgrup: idgrup }, function(response) {
+                $.post('process/ajax_add_member.php', {
+                    username: username_mhs,
+                    idgrup: idgrup
+                }, function(response) {
                     if (response.trim() == 'ok') {
                         alert('Berhasil menambahkan mahasiswa!');
                         location.reload();
@@ -653,26 +691,26 @@ if (isset($_POST['btnTambahThread'])) {
                 }
             });
 
-            const themeToggleBtn = document.getElementById('themeToggle');
-            const body = document.body;
-            const html = document.documentElement;
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
 
-            if (html.classList.contains('dark-mode')) {
-                body.classList.add('dark-mode');
-                html.classList.remove('dark-mode');
-                themeToggleBtn.textContent = '☀️';
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
             }
 
-            themeToggleBtn.addEventListener('click', () => {
-                body.classList.toggle('dark-mode');
-                if (body.classList.contains('dark-mode')) {
+            $themeBtn.on('click', function() {
+                $body.toggleClass('dark-mode');
+                if ($body.hasClass('dark-mode')) {
                     setCookie('theme', 'dark', 365);
-                    themeToggleBtn.textContent = '☀️';
+                    $(this).text('☀️');
                 } else {
                     setCookie('theme', 'light', 365);
-                    themeToggleBtn.textContent = '🌙';
+                    $(this).text('🌙');
                 }
             });
 
@@ -688,4 +726,5 @@ if (isset($_POST['btnTambahThread'])) {
         });
     </script>
 </body>
+
 </html>

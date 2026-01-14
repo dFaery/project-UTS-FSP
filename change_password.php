@@ -4,7 +4,7 @@ if (!isset($_SESSION['user'])) {
     header("Location: login.php");
 } else {
     $username = $_SESSION['user'];
-    $isadmin = $_SESSION['is_admin'];                
+    $isadmin = $_SESSION['is_admin'];
     if ($isadmin == 1) {
         header("Location: admin/adminhome.php");
     }
@@ -60,12 +60,14 @@ if (!isset($_SESSION['user'])) {
             transition: background 0.3s;
         }
 
-        h1, h2 {
+        h1,
+        h2 {
             text-align: center;
             color: var(--text-main);
         }
 
-        .form-group, .form-group-warning-msg {
+        .form-group,
+        .form-group-warning-msg {
             margin-bottom: 20px;
         }
 
@@ -113,7 +115,7 @@ if (!isset($_SESSION['user'])) {
             color: var(--bg-container);
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             font-size: 24px;
             display: flex;
             align-items: center;
@@ -121,7 +123,10 @@ if (!isset($_SESSION['user'])) {
             z-index: 1000;
             transition: transform 0.2s;
         }
-        .theme-toggle-btn:hover { transform: scale(1.1); }
+
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
+        }
     </style>
     <script src="js/jquery-3.7.1.js"></script>
 </head>
@@ -162,7 +167,7 @@ if (!isset($_SESSION['user'])) {
                 document.documentElement.classList.add('dark-mode');
             }
         })();
-        
+
         $(document).ready(function() {
             $('#password, #re_enter_password').keyup(function() {
                 $('.form-group-warning-msg').empty();
@@ -188,27 +193,27 @@ if (!isset($_SESSION['user'])) {
                     alert('Password dan konfirmasi tidak sama!');
                 }
             });
-            
-            const themeToggleBtn = document.getElementById('themeToggle');
-            const body = document.body;
-            const html = document.documentElement;
 
-            if (html.classList.contains('dark-mode')) {
-                body.classList.add('dark-mode');
-                html.classList.remove('dark-mode');
-                themeToggleBtn.textContent = '☀️';
+            const $themeBtn = $('#themeToggle');
+            const $body = $('body');
+            const $html = $('html');
+
+            if ($html.hasClass('dark-mode')) {
+                $body.addClass('dark-mode');
+                $html.removeClass('dark-mode');
+                $themeBtn.text('☀️');
             } else {
-                themeToggleBtn.textContent = '🌙';
+                $themeBtn.text('🌙');
             }
 
-            themeToggleBtn.addEventListener('click', () => {
-                body.classList.toggle('dark-mode');
-                if (body.classList.contains('dark-mode')) {
+            $themeBtn.on('click', function() {
+                $body.toggleClass('dark-mode');
+                if ($body.hasClass('dark-mode')) {
                     setCookie('theme', 'dark', 365);
-                    themeToggleBtn.textContent = '☀️';
+                    $(this).text('☀️');
                 } else {
                     setCookie('theme', 'light', 365);
-                    themeToggleBtn.textContent = '🌙';
+                    $(this).text('🌙');
                 }
             });
 
@@ -224,4 +229,5 @@ if (!isset($_SESSION['user'])) {
         });
     </script>
 </body>
+
 </html>

@@ -32,7 +32,7 @@ if (!$thread) {
 
 $idGrup = $thread['idgrup'];
 $isMember = $grupObj->isMember($idGrup, $username);
-if (!$isMember) {
+if (!$isMember) {        
     echo "<script>alert('Akses Ditolak: Anda bukan anggota grup ini atau telah dikeluarkan.'); window.location.href='index.php';</script>";
     exit();
 }
@@ -202,7 +202,7 @@ $isOpen = ($thread['status']);
             margin-right: 10px;
         }
 
-        body.dark-mode #btn-back img, 
+        body.dark-mode #btn-back img,
         body.dark-mode .send-message img {
             filter: invert(1);
         }
@@ -295,7 +295,7 @@ $isOpen = ($thread['status']);
             color: var(--bg-container);
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             font-size: 20px;
             display: flex;
             align-items: center;
@@ -303,8 +303,10 @@ $isOpen = ($thread['status']);
             z-index: 1001;
             transition: transform 0.2s;
         }
-        .theme-toggle-btn:hover { transform: scale(1.1); }
 
+        .theme-toggle-btn:hover {
+            transform: scale(1.1);
+        }
     </style>
     <script src="js/jquery-3.7.1.js"></script>
 </head>
@@ -391,16 +393,20 @@ $isOpen = ($thread['status']);
             setInterval(loadChat, 2000);
 
             const threadStatus = $('#messageInput').data('thread-status');
-            const isOwner = $("#isOwner").val();
-            
-            if (threadStatus === 'Close') {
-                $('#messageInput').prop('disabled', true);
-                $('#messageInput').attr('placeholder', 'Hanya pembuat thread yang dapat mengirim pesan')
-                $('#sendMessage').prop('disabled', true);
-            }
+            const isOwner = $("#isOwner").val();           
 
             if (isOwner == false) {
                 $(".header-right").hide()
+                if (threadStatus === 'Close') {
+                    $('#messageInput').prop('disabled', true);
+                    $('#messageInput').attr('placeholder', 'Hanya pembuat thread yang dapat mengirim pesan')
+                    $('#sendMessage').prop('disabled', true);
+                }
+            } else {
+                if (threadStatus === 'Close') {
+                    $('#messageInput').prop('disabled', false);                    
+                    $('#sendMessage').prop('disabled', false);
+                }
             }
 
             $("#messageInput").on("input", function() {
@@ -444,13 +450,13 @@ $isOpen = ($thread['status']);
                         let isOwner = $("#isOwner").val();
                         $("#threadStatusNow").val(statusNow);
 
-                        if(isOwner == 1){
+                        if (isOwner == 1) {
                             if (statusNow === "Open") {
                                 $(".tag").removeClass("tag-close").addClass("tag-open").text("OPEN");
                                 $("#btnEditThread").text("Close Thread");
                                 $("#messageInput").prop("disabled", false);
                                 $('#messageInput').attr('placeholder', 'Type a message')
-    
+
                             } else {
                                 $(".tag").removeClass("tag-open").addClass("tag-close").text("CLOSED");
                                 $("#btnEditThread").text("Open Thread");
@@ -527,4 +533,5 @@ $isOpen = ($thread['status']);
         });
     </script>
 </body>
+
 </html>

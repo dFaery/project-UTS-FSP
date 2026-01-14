@@ -12,7 +12,7 @@ else{
 }
 
 require_once("../class/mahasiswa.php");
-$mahasiswaObj = new Mahasiswa(); // Rename variable to avoid conflict with array variable below
+$mahasiswaObj = new Mahasiswa();
 
 if (!isset($_GET['nrp'])) {
     die("NRP tidak ditemukan.");

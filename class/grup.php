@@ -19,7 +19,13 @@ class Grup extends classParent
         $kode = $this->generateKode();
         $stmt = $this->mysqli->prepare("INSERT INTO grup (username_pembuat, nama, deskripsi, tanggal_pembentukan, jenis, kode_pendaftaran) VALUES (?, ?, ?, NOW(), ?, ?)");
         $stmt->bind_param("sssss", $username, $nama, $deskripsi, $jenis, $kode);
-        if($stmt->execute()) return $kode;
+        if($stmt->execute()){
+            $idgrup = $this->mysqli->insert_id;
+
+            $this->addMember($idgrup, $username);
+            return $kode;
+        }
+
         return false;
     }
 

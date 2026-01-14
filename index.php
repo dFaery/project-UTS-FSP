@@ -20,6 +20,7 @@ if ($isDosen && isset($_POST['btnSimpanGrup'])) {
     $kode_baru = $grupObj->createGrup($username, $_POST['nama_grup'], $_POST['deskripsi'], $_POST['jenis']);
     if ($kode_baru) $pesan = "<script>alert('Grup Dibuat! Kode: $kode_baru'); window.location.href='index.php';</script>";
 }
+
 if ($isDosen && isset($_GET['hapus_grup'])) {
     if ($grupObj->deleteGrup($_GET['hapus_grup'], $username)) $pesan = "<script>alert('Grup dihapus!'); window.location.href='index.php';</script>";
 }
@@ -61,6 +62,10 @@ if (isset($_POST['btnJoin'])) {
             --table-hover: #f2f2f2;
             --shadow: rgba(0, 0, 0, 0.1);
             --yellow-box: #fff8e1;
+            --modal-bg: #ffffff;
+            --modal-text: #2c3e50;
+            --modal-overlay: rgba(0, 0, 0, 0.5);
+
         }
 
         body.dark-mode {
@@ -75,6 +80,10 @@ if (isset($_POST['btnJoin'])) {
             --table-hover: #3a3b3c;
             --shadow: rgba(255, 255, 255, 0.1);
             --yellow-box: #4a4218;
+            --modal-bg: #242526;
+            --modal-text: #e4e6eb;
+            --modal-overlay: rgba(0, 0, 0, 0.7);
+
         }
 
         * {
@@ -100,7 +109,9 @@ if (isset($_POST['btnJoin'])) {
             transition: background 0.3s;
         }
 
-        h1, h2, h3 {
+        h1,
+        h2,
+        h3 {
             color: var(--text-main);
         }
 
@@ -122,11 +133,27 @@ if (isset($_POST['btnJoin'])) {
             margin-bottom: 20px;
         }
 
-        .btn-logout { background: #e74c3c; }
-        .btn-change-password { background: #8e44ad; }
-        .btn-save { background: #2ecc71; width: 100%; padding: 10px; }
-        .btn-kelola { background: #3498db; }
-        .btn-view { background: #f39c12; }
+        .btn-logout {
+            background: #e74c3c;
+        }
+
+        .btn-change-password {
+            background: #8e44ad;
+        }
+
+        .btn-save {
+            background: #2ecc71;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .btn-kelola {
+            background: #3498db;
+        }
+
+        .btn-view {
+            background: #f39c12;
+        }
 
         .form-box {
             background: var(--form-bg);
@@ -136,9 +163,13 @@ if (isset($_POST['btnJoin'])) {
             border: 1px solid var(--form-border);
         }
 
-        .form-group { margin-bottom: 10px; }
+        .form-group {
+            margin-bottom: 10px;
+        }
 
-        input, select, textarea {
+        input,
+        select,
+        textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--form-border);
@@ -168,7 +199,7 @@ if (isset($_POST['btnJoin'])) {
             word-wrap: break-word;
             color: var(--text-secondary);
         }
-        
+
         tr:hover {
             background-color: var(--table-hover);
         }
@@ -197,7 +228,7 @@ if (isset($_POST['btnJoin'])) {
             color: var(--bg-container);
             border: none;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
             font-size: 24px;
             display: flex;
             align-items: center;
@@ -205,40 +236,109 @@ if (isset($_POST['btnJoin'])) {
             z-index: 1000;
             transition: transform 0.2s;
         }
+
         .theme-toggle-btn:hover {
             transform: scale(1.1);
         }
 
-        .flex-row { display: flex; gap: 20px; flex-wrap: wrap; }
-        .flex-col { flex: 1; min-width: 300px; }
+        .flex-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .flex-col {
+            flex: 1;
+            min-width: 300px;
+        }
+     
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--modal-overlay);
+            z-index: 999;
+        }
+
+        .modal-box {
+            background: var(--modal-bg);
+            color: var(--modal-text);
+            width: 90%;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px var(--shadow);
+            position: relative;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .modal-box h3,
+        .modal-box p,
+        .modal-box small {
+            color: var(--modal-text);
+        }
+
 
         @media screen and (max-width: 768px) {
-            body { padding: 10px; }
-            .container { padding: 15px; width: 100%; }
-            .header-buttons { 
-                flex-direction: row; 
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                width: 100%;
+            }
+
+            .header-buttons {
+                flex-direction: row;
                 justify-content: center;
-                gap: 10px; 
+                gap: 10px;
                 flex-wrap: wrap;
             }
-            .btn-change-password, .btn-logout { 
+
+            .btn-change-password,
+            .btn-logout {
                 width: auto;
             }
 
-            .flex-row { flex-direction: column; }
-            .flex-col { width: 100%; }
-            table { display: block; overflow-x: auto; white-space: nowrap; table-layout: auto; }
-            th, td { min-width: 120px; }
-            .btn-kelola, .btn-logout, .btn-view, .btn-change-password { padding: 6px 10px; font-size: 14px; margin-bottom: 2px; }
+            .flex-row {
+                flex-direction: column;
+            }
+
+            .flex-col {
+                width: 100%;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                table-layout: auto;
+            }
+
+            th,
+            td {
+                min-width: 120px;
+            }
+
+            .btn-kelola,
+            .btn-logout,
+            .btn-view,
+            .btn-change-password {
+                padding: 6px 10px;
+                font-size: 14px;
+                margin-bottom: 2px;
+            }
         }
     </style>
-    
+
     <script src="js/jquery-3.7.1.js"></script>
 </head>
 
 <body>
     <?= $pesan ?>
-    
+
     <button class="theme-toggle-btn" id="themeToggle" title="Ganti Tema">🌓</button>
 
     <div class="container">
@@ -275,25 +375,25 @@ if (isset($_POST['btnJoin'])) {
 
             <h3>Grup Saya (Pemilik)</h3>
             <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%">No</th>
-                        <th width="25%">Nama Grup</th>
-                        <th width="15%">Kode</th>
-                        <th width="35%">Deskripsi</th>
-                        <th width="20%">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $res = $grupObj->getGrupByDosen($username);
-                    if ($res->num_rows > 0) {
-                        $no = 1;
-                        while ($r = $res->fetch_assoc()) {
-                            $labelJenis = ($r['jenis'] == 'Privat') ? "<span style='background:red; color:white; padding:2px 4px; font-size:10px; border-radius:3px;'>PRIVAT</span>" : "";
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="25%">Nama Grup</th>
+                            <th width="15%">Kode</th>
+                            <th width="35%">Deskripsi</th>
+                            <th width="20%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $res = $grupObj->getGrupByDosen($username);
+                        if ($res->num_rows > 0) {
+                            $no = 1;
+                            while ($r = $res->fetch_assoc()) {
+                                $labelJenis = ($r['jenis'] == 'Privat') ? "<span style='background:red; color:white; padding:2px 4px; font-size:10px; border-radius:3px;'>PRIVAT</span>" : "";
 
-                            echo "<tr>
+                                echo "<tr>
                                 <td>" . $no++ . "</td>
                                 <td><b>" . htmlspecialchars($r['nama']) . "</b> $labelJenis</td>
                                 <td><span class='badge-code'>" . $r['kode_pendaftaran'] . "</span></td>
@@ -303,74 +403,74 @@ if (isset($_POST['btnJoin'])) {
                                     <a href='index.php?hapus_grup=" . $r['idgrup'] . "' class='btn btn-logout' style='float:none; padding:8px; background:#e74c3c;' onclick='return confirm(\"Hapus grup?\")'>Hapus</a>
                                 </td>
                             </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5'>Belum ada grup.</td></tr>";
                         }
-                    } else {
-                        echo "<tr><td colspan='5'>Belum ada grup.</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+                        ?>
+                    </tbody>
+                </table>
             </div>
 
             <hr style="border:0; border-top:1px dashed #ccc; margin:30px 0;">
 
             <h3>Grup yang Saya Ikuti (Tim Dosen)</h3>
             <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%">No</th>
-                        <th width="25%">Nama Grup</th>
-                        <th width="20%">Dosen Pemilik</th>
-                        <th width="35%">Deskripsi</th>
-                        <th width="15%" style="text-align: center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $resJoined = $grupObj->getJoinedGroups($username);
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="25%">Nama Grup</th>
+                            <th width="20%">Dosen Pemilik</th>
+                            <th width="35%">Deskripsi</th>
+                            <th width="15%" style="text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $resJoined = $grupObj->getJoinedGroups($username);
 
-                    if ($resJoined->num_rows > 0) {
-                        $no = 1;
-                        while ($row = $resJoined->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td>" . $no++ . "</td>";
-                            echo "<td><b>" . htmlspecialchars($row['nama']) . "</b></td>";
-                            echo "<td>" . htmlspecialchars($row['username_pembuat']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['deskripsi']) . "</td>";
+                        if ($resJoined->num_rows > 0) {
+                            $no = 1;
+                            while ($row = $resJoined->fetch_assoc()) {
+                                echo "<tr>";
+                                echo "<td>" . $no++ . "</td>";
+                                echo "<td><b>" . htmlspecialchars($row['nama']) . "</b></td>";
+                                echo "<td>" . htmlspecialchars($row['username_pembuat']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['deskripsi']) . "</td>";
 
-                            echo "<td style='text-align: center;'>";
-                            echo "<a href='detail_grup.php?id=" . $row['idgrup'] . "' class='btn btn-save' style='padding:5px 10px; width:auto; background: #f39c12;'>Lihat</a>";
-                            echo "</td>";
-                            echo "</tr>";
+                                echo "<td style='text-align: center;'>";
+                                echo "<a href='detail_grup.php?id=" . $row['idgrup'] . "' class='btn btn-save' style='padding:5px 10px; width:auto; background: #f39c12;'>Lihat</a>";
+                                echo "</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5' style='text-align:center; color:gray;'>Anda belum bergabung dengan grup dosen lain.</td></tr>";
                         }
-                    } else {
-                        echo "<tr><td colspan='5' style='text-align:center; color:gray;'>Anda belum bergabung dengan grup dosen lain.</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+                        ?>
+                    </tbody>
+                </table>
             </div>
 
             <h3>Grup Publik (Dosen Lain)</h3>
             <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%">No</th>
-                        <th width="25%">Nama Grup</th>
-                        <th width="20%">Dosen</th>
-                        <th width="30%">Deskripsi</th>
-                        <th width="20%">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $resPub = $grupObj->getAvailablePublicGroups($username);
-                    if ($resPub->num_rows > 0) {
-                        $no = 1;
-                        while ($r = $resPub->fetch_assoc()) {
-                            echo "<tr>
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="25%">Nama Grup</th>
+                            <th width="20%">Dosen</th>
+                            <th width="30%">Deskripsi</th>
+                            <th width="20%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $resPub = $grupObj->getAvailablePublicGroups($username);
+                        if ($resPub->num_rows > 0) {
+                            $no = 1;
+                            while ($r = $resPub->fetch_assoc()) {
+                                echo "<tr>
                                 <td>" . $no++ . "</td>
                                 <td><b>" . htmlspecialchars($r['nama']) . "</b></td>
                                 <td>" . htmlspecialchars($r['username_pembuat']) . "</td>
@@ -382,13 +482,13 @@ if (isset($_POST['btnJoin'])) {
                                     </form>
                                 </td>
                             </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5'>Tidak ada grup publik baru.</td></tr>";
                         }
-                    } else {
-                        echo "<tr><td colspan='5'>Tidak ada grup publik baru.</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+                        ?>
+                    </tbody>
+                </table>
             </div>
 
         <?php else: ?>
@@ -397,57 +497,57 @@ if (isset($_POST['btnJoin'])) {
 
             <h3>Grup yang Saya Ikuti</h3>
             <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%">No</th>
-                        <th width="25%">Nama Grup</th>
-                        <th width="20%">Dosen</th>
-                        <th width="35%">Deskripsi</th>
-                        <th width="15%">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $res = $grupObj->getJoinedGroups($username);
-                    if ($res->num_rows > 0) {
-                        $no = 1;
-                        while ($r = $res->fetch_assoc()) {
-                            echo "<tr>
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="25%">Nama Grup</th>
+                            <th width="20%">Dosen</th>
+                            <th width="35%">Deskripsi</th>
+                            <th width="15%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $res = $grupObj->getJoinedGroups($username);
+                        if ($res->num_rows > 0) {
+                            $no = 1;
+                            while ($r = $res->fetch_assoc()) {
+                                echo "<tr>
                                 <td>" . $no++ . "</td>
                                 <td><b>" . htmlspecialchars($r['nama']) . "</b></td>
                                 <td>" . htmlspecialchars($r['username_pembuat']) . "</td>
                                 <td>" . htmlspecialchars($r['deskripsi']) . "</td>
                                 <td><a href='detail_grup.php?id=" . $r['idgrup'] . "' class='btn btn-view'>Lihat</a></td>
                             </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5'>Belum join grup.</td></tr>";
                         }
-                    } else {
-                        echo "<tr><td colspan='5'>Belum join grup.</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+                        ?>
+                    </tbody>
+                </table>
             </div>
 
             <h3>Jelajahi Grup Publik</h3>
             <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%">No</th>
-                        <th width="25%">Nama Grup</th>
-                        <th width="20%">Dosen</th>
-                        <th width="35%">Deskripsi</th>
-                        <th width="15%">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $resPub = $grupObj->getAvailablePublicGroups($username);
-                    if ($resPub->num_rows > 0) {
-                        $no = 1;
-                        while ($r = $resPub->fetch_assoc()) {
-                            echo "<tr>
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%">No</th>
+                            <th width="25%">Nama Grup</th>
+                            <th width="20%">Dosen</th>
+                            <th width="35%">Deskripsi</th>
+                            <th width="15%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $resPub = $grupObj->getAvailablePublicGroups($username);
+                        if ($resPub->num_rows > 0) {
+                            $no = 1;
+                            while ($r = $resPub->fetch_assoc()) {
+                                echo "<tr>
                                 <td>" . $no++ . "</td>
                                 <td><b>" . htmlspecialchars($r['nama']) . "</b></td>
                                 <td>" . htmlspecialchars($r['nama_dosen']) . "</td>
@@ -460,13 +560,13 @@ if (isset($_POST['btnJoin'])) {
                                     </button>
                                 </td>
                             </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='5' style='text-align:center;'>Tidak ada grup publik baru.</td></tr>";
                         }
-                    } else {
-                        echo "<tr><td colspan='5' style='text-align:center;'>Tidak ada grup publik baru.</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+                        ?>
+                    </tbody>
+                </table>
             </div>
 
         <?php endif; ?>
@@ -476,9 +576,8 @@ if (isset($_POST['btnJoin'])) {
         </div>
     </div>
 
-    <div id="modalJoin" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;">
-        <div style="background:white; width:90%; max-width:400px; margin:100px auto; padding:20px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.2); position:relative;">
-
+    <div id="modalJoin" class="modal-overlay">
+        <div class="modal-box">
             <h3 style="margin-top:0;">Masukkan Kode Grup</h3>
             <p>Anda akan bergabung ke grup: <br><b id="modalGrupName" style="color:#2c3e50;">-</b></p>
             <p><small>Dosen: <span id="modalDosenName">-</span></small></p>
@@ -564,4 +663,5 @@ if (isset($_POST['btnJoin'])) {
     </script>
 
 </body>
+
 </html>

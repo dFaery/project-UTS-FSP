@@ -101,8 +101,7 @@ else{
         .btn.logout:hover {
             background-color: #b53e29ff;
         }
-
-        /* Toggle Button Style */
+       
         .theme-toggle-btn {
             position: fixed;
             bottom: 20px;
